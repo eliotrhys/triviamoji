@@ -15,7 +15,14 @@ export default function SideMenu(props: SideMenuProps) {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const savedCheckedItems = JSON.parse(localStorage.getItem('checkedItems') || '[]');
+      let savedCheckedItems = JSON.parse(localStorage.getItem('checkedItems') || '[]');
+      
+      // Initialize with Nation Flags excluded by default for new users only
+      if (savedCheckedItems.length === 0) {
+        savedCheckedItems = [MediaType.NationFlag];
+        localStorage.setItem('checkedItems', JSON.stringify(savedCheckedItems));
+      }
+      
       setCheckedMediaTypes(savedCheckedItems);
     }
   }, []);
@@ -77,7 +84,7 @@ export default function SideMenu(props: SideMenuProps) {
           <div className="">
             { allMediaTypes }
           </div>
-          <Link href={"https://twitter.com/eliotrhys"} target="_blank" className="flex items-center ease-in-out duration-100 hover:scale-105 mb-8">
+          <Link href={"https://twitter.com/eliothectorson"} target="_blank" className="flex items-center ease-in-out duration-100 hover:scale-105 mb-8">
             <div>
               <img src="/images/twitter.png" className="mr-4" style={{ height: "24px" }} alt="" />
             </div>
@@ -86,7 +93,6 @@ export default function SideMenu(props: SideMenuProps) {
               <div className="text-xs text-slate-300">&#40;I&apos;m smart and funny&#41;</div>
             </div>
           </Link>
-          <div className="text-xs mb-6">🚨 Also, if your team is hiring designers, front-end developers or general creative people please let me know - looking for a job!</div>
           <div className="text-xs">🎨 Illustrations by TECHCROWD</div>
         </div>
       </div>

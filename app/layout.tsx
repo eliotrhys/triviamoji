@@ -33,7 +33,7 @@ export default function RootLayout({ children }: { children: any }) {
             }}
           />
       </head>
-      <body>{children}</body>
+      <body className="w-full">{children}</body>
       
       {/* <!-- Google tag (gtag.js) --> */}
 

@@ -24,7 +24,7 @@ export default function Page()
     
 
     return (
-        <div>
+        <div className="w-full">
             <GameForm isSuddenDeath={isSuddenDeath} />
         </div>
     )

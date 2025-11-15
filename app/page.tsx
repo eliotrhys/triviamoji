@@ -47,7 +47,7 @@ export default function Page() {
                 <img src="/images/smileys/smiley_clown.png" className="absolute top-0 right-0 corner-smiley hover:scale-125 ease-in-out duration-100" />
             </motion.div>
             <div className="intro-page bg-blue-500">
-                <Link href={"https://twitter.com/eliotrhys"} target="_blank" className="flex items-center justify-center ease-in-out duration-100 hover:scale-105 py-6 pr-6 absolute top-0 right-0 hidden md:flex cursor-pointer">
+                <Link href={"https://twitter.com/eliothectorson"} target="_blank" className="flex items-center justify-center ease-in-out duration-100 hover:scale-105 py-6 pr-6 absolute top-0 right-0 hidden md:flex cursor-pointer">
                     <div>
                         <img src="/images/twitter.png" className="mr-4" style={{ height: "24px" }} alt="" />
                     </div>
@@ -161,7 +161,7 @@ export default function Page() {
                 </motion.div>
                 
                 <div>
-                    <Link href={"https://twitter.com/eliotrhys"} target="_blank" className="flex items-center justify-center ease-in-out duration-100 hover:scale-105 py-6 cursor-pointer">
+                    <Link href={"https://twitter.com/eliothectorson"} target="_blank" className="flex items-center justify-center ease-in-out duration-100 hover:scale-105 py-6 cursor-pointer">
                         <div>
                             <img src="/images/twitter.png" className="mr-4" style={{ height: "24px" }} alt="" />
                         </div>

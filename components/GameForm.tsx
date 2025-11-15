@@ -20,6 +20,7 @@ import shuffle from "../app/utils/shuffle";
 // Types
 import Question from "../app/types/Question";
 import Guess from "../app/types/Guess";
+import { MediaType } from "../app/types/MediaType";
 
 
 interface GameFormProps {
@@ -82,7 +83,13 @@ export default function GameForm(props: GameFormProps) {
   // This function shuffles the questions array and starts Intro Countdown
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const savedCheckedItems = JSON.parse(localStorage.getItem('checkedItems') || '[]');
+      let savedCheckedItems = JSON.parse(localStorage.getItem('checkedItems') || '[]');
+      
+      // Initialize with Nation Flags excluded by default for new users only
+      if (savedCheckedItems.length === 0) {
+        savedCheckedItems = [MediaType.NationFlag];
+        localStorage.setItem('checkedItems', JSON.stringify(savedCheckedItems));
+      }
 
       const filteredQuestions = questions.filter((question) => {
         return !savedCheckedItems.includes(question.mediaType);
@@ -163,7 +170,13 @@ export default function GameForm(props: GameFormProps) {
 
     if (typeof window !== "undefined") 
     {
-      const savedCheckedItems = JSON.parse(localStorage.getItem('checkedItems') || '[]');
+      let savedCheckedItems = JSON.parse(localStorage.getItem('checkedItems') || '[]');
+      
+      // Ensure Nation Flags is excluded by default for new users only
+      if (savedCheckedItems.length === 0) {
+        savedCheckedItems = [MediaType.NationFlag];
+        localStorage.setItem('checkedItems', JSON.stringify(savedCheckedItems));
+      }
 
       const filteredQuestions = questions.filter((question) => {
         return !savedCheckedItems.includes(question.mediaType);
