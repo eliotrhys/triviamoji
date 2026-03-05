@@ -28,6 +28,7 @@ interface GameFormProps {
 }
 
 export default function GameForm(props: GameFormProps) {
+  const { isSuddenDeath } = props;
   // Initialisation
   const [questionIndex, setQuestionIndex] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -114,7 +115,7 @@ export default function GameForm(props: GameFormProps) {
   useEffect(() => {
     if (typeof window !== "undefined") {
 
-      if (props.isSuddenDeath) 
+      if (isSuddenDeath) 
       {
         if (correctCount > highestScoreSuddenDeath) {
           setHighestScoreSuddenDeath(correctCount);
@@ -129,7 +130,7 @@ export default function GameForm(props: GameFormProps) {
         }
       }
     }
-  }, [correctCount, setHighestScore, highestScore, setHighestScoreSuddenDeath, highestScoreSuddenDeath]);
+  }, [correctCount, highestScore, highestScoreSuddenDeath, isSuddenDeath]);
   
   // Handle Guess
   const handleGuess = (isCorrect: boolean) => {
@@ -141,13 +142,13 @@ export default function GameForm(props: GameFormProps) {
       setCorrectCount((prevIndex) => prevIndex + 1)
     }
 
-    setGuesses([...guesses, newGuess]);
+    setGuesses((prevGuesses) => [...prevGuesses, newGuess]);
 
     if (questionIndex === shuffledQuestions.length - 1) {
       // Should never be hit but keep in case
       setShowCongratulationsScreen(true);
     } 
-    else if (props.isSuddenDeath && !newGuess.isCorrect)
+    else if (isSuddenDeath && !newGuess.isCorrect)
     {
       setShowCongratulationsScreen((isShowing) => !isShowing);
     }
@@ -206,7 +207,7 @@ export default function GameForm(props: GameFormProps) {
   }
 
   const handleTimeTick = () => {
-    if (!props.isSuddenDeath) 
+    if (!isSuddenDeath) 
     {
       setTimeRemaining((prevTimeRemaining) => prevTimeRemaining - 1);
     }
@@ -235,14 +236,14 @@ export default function GameForm(props: GameFormProps) {
           <>
             <div className="min-h-screen min-w-screen flex flex-col justify-between">
               <Navbar onMenuToggle={handleMenuToggle} />
-              <CongratulationsScreen onRestart={handleRestart} count={count} guesses={guesses} finalScore={guesses.filter((guess) => guess.isCorrect === true).length} isSuddenDeath={props.isSuddenDeath} />
+              <CongratulationsScreen onRestart={handleRestart} count={count} guesses={guesses} finalScore={guesses.filter((guess) => guess.isCorrect === true).length} isSuddenDeath={isSuddenDeath} />
             </div>
           </>
         ) : showIntroScreen ? (
           <>
             <div className="min-h-screen min-w-screen flex flex-col justify-between">
               <Navbar onMenuToggle={handleMenuToggle} />
-              <IntroScreen introTimeRemaining={introTimeRemaining} onIntroTimeTick={handleIntroTimeTick} onCountdownFinish={handleIntroCountdownFinish} isSuddenDeath={props.isSuddenDeath} />
+              <IntroScreen introTimeRemaining={introTimeRemaining} onIntroTimeTick={handleIntroTimeTick} onCountdownFinish={handleIntroCountdownFinish} isSuddenDeath={isSuddenDeath} />
             </div>
           </>
         ) : (
@@ -255,9 +256,9 @@ export default function GameForm(props: GameFormProps) {
                   <div className="w-full lg:w-2/3 xl:w-1/3 mx-auto flex flex-col justify-between">
                     <div className="">
                       <div className="rounded-full text-black mt-4">
-                        <div className={`grid ${ props.isSuddenDeath ? "grid-cols-1" : "grid-cols-2"} mb-2`}>
-                          <Counter count={count} isSuddenDeath={props.isSuddenDeath} />
-                          { props.isSuddenDeath ? 
+                        <div className={`grid ${ isSuddenDeath ? "grid-cols-1" : "grid-cols-2"} mb-2`}>
+                          <Counter count={count} isSuddenDeath={isSuddenDeath} />
+                          { isSuddenDeath ? 
                             null 
                             :
                             <div className="px-2">

@@ -1,31 +1,18 @@
-"use client"
-
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import GameForm from "../../components/GameForm";
 
-export default function Page()
-{
-    const [isSuddenDeath, setIsSuddenDeath] = useState(false);
-    const searchParams = useSearchParams();
-    const isSuddenDeathParam = searchParams.get("isSuddenDeath");
+interface PageProps {
+  searchParams: Promise<{
+    isSuddenDeath?: string;
+  }>;
+}
 
-    useEffect(() => {
-        if (isSuddenDeathParam === "true") 
-        {
-            setIsSuddenDeath(true);
-        }
-        else 
-        {
-            setIsSuddenDeath(false);
-        }
-    }, []);
+export default async function Page({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const isSuddenDeath = params.isSuddenDeath === "true";
 
-    
-
-    return (
-        <div className="w-full">
-            <GameForm isSuddenDeath={isSuddenDeath} />
-        </div>
-    )
+  return (
+    <div className="w-full">
+      <GameForm isSuddenDeath={isSuddenDeath} />
+    </div>
+  );
 }

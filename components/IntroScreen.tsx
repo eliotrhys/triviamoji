@@ -9,24 +9,25 @@ interface IntroScreenProps {
 }
 
 export default function IntroScreen(props: IntroScreenProps) {
+  const { introTimeRemaining, onCountdownFinish, onIntroTimeTick, isSuddenDeath } = props;
 
   // Countdown timer
   useEffect(() => {
     const timer = setInterval(() => {
-        props.onIntroTimeTick();
+        onIntroTimeTick();
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [onIntroTimeTick]);
 
   useEffect(() => {
-    if (props.introTimeRemaining === 0) {
-      props.onCountdownFinish();
+    if (introTimeRemaining === 0) {
+      onCountdownFinish();
     }
-  }, [props.introTimeRemaining]);
+  }, [introTimeRemaining, onCountdownFinish]);
 
   return (
-    <div className={`min-h-screen min-w-screen text-center flex items-center justify-center ${ props.isSuddenDeath ? "bg-black" : "" }`}>
+    <div className={`min-h-screen min-w-screen text-center flex items-center justify-center ${ isSuddenDeath ? "bg-black" : "" }`}>
       <div className="container mx-auto px-4">
           <div className="flex flex-col justify-between">
             <div>
@@ -36,7 +37,7 @@ export default function IntroScreen(props: IntroScreenProps) {
                   transition={{ type: "spring", bounce: 0.4, duration: 0.8 }}
                 >
                   <div className="animate-bounce">
-                    { props.isSuddenDeath ? 
+                    { isSuddenDeath ? 
                       <div>
                         <h1 className="huge-emoji">☠️</h1>
                         <h1 className="text-md lg:text-4xl -mt-10 mb-20 text-red-600">NO SECOND CHANCES</h1>
@@ -54,14 +55,14 @@ export default function IntroScreen(props: IntroScreenProps) {
                   animate={{ y: [-800, 0]} } 
                   transition={{ type: "spring", bounce: 0.4, duration: 1.2 }}
                 >
-                  <h1 className={`text-5xl lg:text-9xl mb-10 ${ props.isSuddenDeath ? "text-red-600" : "text-black" } font-black`}>{ props.introTimeRemaining }</h1>
+                  <h1 className={`text-5xl lg:text-9xl mb-10 ${ isSuddenDeath ? "text-red-600" : "text-black" } font-black`}>{ introTimeRemaining }</h1>
                 </motion.div>
                 <motion.div
                   animate={{ y: [800, 0]} } 
                   transition={{ type: "spring", bounce: 0.4, duration: 0.8 }}
                 >
                   <div>
-                    { props.isSuddenDeath ? 
+                    { isSuddenDeath ? 
                       <div>
                         <div className="w-full sm:w-2/3 lg:1/2 mx-auto">
                           <div className="bg-white border-4 border-black p-4 text-md lg:text-2xl rounded-lg text-center">

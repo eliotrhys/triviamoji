@@ -1,6 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { MediaType } from "../app/types/MediaType";
 
 interface SideMenuProps {
@@ -11,21 +10,21 @@ interface SideMenuProps {
 
 export default function SideMenu(props: SideMenuProps) {
 
-  const [checkedMediaTypes, setCheckedMediaTypes] = useState<MediaType[]>([]);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      let savedCheckedItems = JSON.parse(localStorage.getItem('checkedItems') || '[]');
-      
-      // Initialize with Nation Flags excluded by default for new users only
-      if (savedCheckedItems.length === 0) {
-        savedCheckedItems = [MediaType.NationFlag];
-        localStorage.setItem('checkedItems', JSON.stringify(savedCheckedItems));
-      }
-      
-      setCheckedMediaTypes(savedCheckedItems);
+  const [checkedMediaTypes, setCheckedMediaTypes] = useState<MediaType[]>(() => {
+    if (typeof window === "undefined") {
+      return [];
     }
-  }, []);
+
+    let savedCheckedItems = JSON.parse(localStorage.getItem("checkedItems") || "[]");
+
+    // Initialize with Nation Flags excluded by default for new users only
+    if (savedCheckedItems.length === 0) {
+      savedCheckedItems = [MediaType.NationFlag];
+      localStorage.setItem("checkedItems", JSON.stringify(savedCheckedItems));
+    }
+
+    return savedCheckedItems;
+  });
 
   const handleClose = () => {
     props.onMenuToggle();
@@ -35,22 +34,18 @@ export default function SideMenu(props: SideMenuProps) {
     const isChecked = e.target.checked;
     const value = e.target.value as MediaType;
 
-    if (!isChecked) 
-    {
-      setCheckedMediaTypes(prevState => [...prevState, value]);
-      props.onCheckboxChange([...checkedMediaTypes, value]);
-    }
-    else 
-    {
-      setCheckedMediaTypes(prevState => prevState.filter(type => type !== value));
-      props.onCheckboxChange(checkedMediaTypes.filter(type => type !== value));
-    }
+    setCheckedMediaTypes((prevState) => {
+      const nextState = !isChecked
+        ? [...prevState, value]
+        : prevState.filter((type) => type !== value);
+
+      props.onCheckboxChange(nextState);
+      return nextState;
+    });
   }
 
-  const savedCheckedItems = typeof window !== "undefined" ? JSON.parse(localStorage.getItem('checkedItems') || '[]') : [];
-
   const allMediaTypes = Object.values(MediaType).map((mediaType) => {
-    const isChecked = savedCheckedItems.includes(mediaType);
+    const isChecked = checkedMediaTypes.includes(mediaType);
     return (
       <div className="mb-6" key={mediaType}>
         <input

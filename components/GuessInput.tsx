@@ -36,7 +36,7 @@ export default function GuessInput(props: GuessInputProps) {
   
     useEffect(() => {
       resetImages();
-    }, [resetImages]);
+    }, [props.answer, resetImages]);
     
     const handleSubmit = () => {
 
@@ -69,7 +69,7 @@ export default function GuessInput(props: GuessInputProps) {
 
     const handleCurrentWordChange = useCallback((currentWord: string) => {
       setGuess(currentWord);
-    }, [guess]);
+    }, []);
 
     return (
         <div className="mb-4 lg:mb-4 relative">

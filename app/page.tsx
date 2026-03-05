@@ -1,10 +1,9 @@
 "use client"
 
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { useRouter } from "next/router";
+import { motion, type Variants } from "framer-motion";
 
-const variants = {
+const variants: Variants = {
     hidden: { opacity: 0 },
     showing: {
         opacity: 1,
@@ -14,7 +13,7 @@ const variants = {
     }
 }
 
-const animationItem = {
+const animationItem: Variants = {
     hidden: {
         opacity: 0,
         scale: 0
@@ -38,13 +37,13 @@ export default function Page() {
                 animate={{ y: [-800, 0]} } 
                 transition={{ type: "spring", bounce: 0.4, duration: 1.2 }}
             >
-                <img src="/images/smileys/smiley_cry.png" className="absolute top-0 left-0 corner-smiley hover:scale-125 ease-in-out duration-100" />
+                <img src="/images/smileys/smiley_cry.png" className="absolute top-0 left-0 corner-smiley hover:scale-125 ease-in-out duration-100" alt="" />
             </motion.div>
             <motion.div
                 animate={{ y: [-800, 0]} } 
                 transition={{ type: "spring", bounce: 0.4, duration: 1.8 }}
             >
-                <img src="/images/smileys/smiley_clown.png" className="absolute top-0 right-0 corner-smiley hover:scale-125 ease-in-out duration-100" />
+                <img src="/images/smileys/smiley_clown.png" className="absolute top-0 right-0 corner-smiley hover:scale-125 ease-in-out duration-100" alt="" />
             </motion.div>
             <div className="intro-page bg-blue-500">
                 <Link href={"https://twitter.com/eliothectorson"} target="_blank" className="flex items-center justify-center ease-in-out duration-100 hover:scale-105 py-6 pr-6 absolute top-0 right-0 hidden md:flex cursor-pointer">
@@ -109,7 +108,7 @@ export default function Page() {
             </div>
             <div>
                 <div style={{ marginBottom: "-15%" }}>
-                    <img src="/images/blue_wave.svg" />
+                    <img src="/images/blue_wave.svg" alt="" />
                 </div>
             </div>
             <div className="container w-full lg:w-3/4 xl:w-2/3 mx-auto px-4">

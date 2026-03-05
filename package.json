@@ -4,26 +4,26 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 8082",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start -p 8082",
-    "lint": "next lint"
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
-    "framer-motion": "^10.3.2",
-    "next": "^13.2.4",
-    "next-pwa": "^5.6.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "@ducanh2912/next-pwa": "^10.2.9",
+    "framer-motion": "^12.35.0",
+    "next": "^16.1.6",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
   },
   "devDependencies": {
-    "@types/node": "18.11.7",
-    "@types/react": "18.0.24",
-    "@types/react-dom": "18.0.8",
-    "autoprefixer": "^10.4.14",
-    "eslint": "8.26.0",
-    "eslint-config-next": "13.0.0",
-    "postcss": "^8.4.21",
-    "tailwindcss": "^3.2.7",
-    "typescript": "4.8.4"
+    "@types/node": "^25.3.3",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "autoprefixer": "^10.4.22",
+    "eslint": "^9.39.0",
+    "eslint-config-next": "^16.1.6",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.18",
+    "typescript": "^5.9.3"
   }
 }

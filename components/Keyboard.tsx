@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Key from './Key';
 
 type KeyboardLayout = string[][];
@@ -10,12 +10,13 @@ interface KeyboardProps {
 }
 
 export default function Keyboard(props: KeyboardProps) {
+    const { handleCurrentWordChange, onEnter } = props;
 
     const [currentWord, setCurrentWord] = useState<string>("");
     const [keyIsActive, setKeyIsActive] = useState(false);
     const [pressedKey, setPressedKey] = useState("");
 
-    const handleKeyPress = async (letter: string) => {
+    const handleKeyPress = useCallback((letter: string) => {
         switch (letter) {
             case 'BACKSPACE':
                 if (currentWord.length > 0) {
@@ -24,14 +25,13 @@ export default function Keyboard(props: KeyboardProps) {
                 }
                 break;
             case 'SPACE':
-                console.log("PRESSED KEY IS: " + pressedKey);
                 if (currentWord.length > 0) {
                     setCurrentWord((word) => word + ' ');
                 }
                 break;
             case 'ENTER':
-                await props.handleCurrentWordChange(currentWord);
-                await props.onEnter();
+                handleCurrentWordChange(currentWord);
+                onEnter();
                 setCurrentWord("");
                 break;
             default:
@@ -41,14 +41,14 @@ export default function Keyboard(props: KeyboardProps) {
                 }
                 break;
         }
-    };
+    }, [currentWord, handleCurrentWordChange, onEnter]);
 
     useEffect(() => {
-        props.handleCurrentWordChange(currentWord);
-    }, [currentWord, props.handleCurrentWordChange]);
+        handleCurrentWordChange(currentWord);
+    }, [currentWord, handleCurrentWordChange]);
 
     // Listeners for physical keydowns
-    const handleKeyDown = (event: KeyboardEvent) => {
+    const handleKeyDown = useCallback((event: KeyboardEvent) => {
         
         const key = event.key.toUpperCase();
 
@@ -66,9 +66,6 @@ export default function Keyboard(props: KeyboardProps) {
 
         if (allowedKeys.includes(key)) 
         {
-            // TO DO - FIGURE OUT WHY SPACEBAR ISN'T WORKING
-            if (key === " "){ console.log("ITS ALIVE THE SPACEBAR"); };
-
             setPressedKey(key);
 
             if (key === 'BACKSPACE') 
@@ -95,12 +92,12 @@ export default function Keyboard(props: KeyboardProps) {
                 handleKeyPress(key);
             }
         }
-    };
+    }, [handleKeyPress]);
 
-    const handleKeyUp = () => {
+    const handleKeyUp = useCallback(() => {
         setKeyIsActive(false);
         setPressedKey("");
-    };
+    }, []);
 
     useEffect(() => {
         document.addEventListener('keydown', handleKeyDown);
@@ -110,7 +107,7 @@ export default function Keyboard(props: KeyboardProps) {
         document.removeEventListener('keydown', handleKeyDown);
         document.removeEventListener('keyup', handleKeyUp);
         };
-    }, [currentWord, handleKeyPress]);
+    }, [handleKeyDown, handleKeyUp]);
 
   const keyboardLayout: KeyboardLayout = [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],

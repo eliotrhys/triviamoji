@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import React from "react";
-import { render } from "react-dom";
 import Guess from "../app/types/Guess";
 import Points from "./Points";
 
