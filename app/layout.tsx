@@ -19,6 +19,7 @@ export default function RootLayout({ children }: { children: any }) {
         <meta property="og:type" content="website" />
         <meta property="og:image" content="/images/triviamoji_og.jpg" />
         <meta name="keywords" content="Triviamoji, Emoji trivia, Emoji guessing game, Emoji trivia challenge, Guess the emoji game, Emoji quiz challenge, Emoji charades game, Emoji puzzle game, Emoji word game, Emoji brain teaser, Emoji guessing competition, Emoji riddle game, Emoji, Guess the emoji" />
+        <Script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8259590562391591" crossOrigin="anonymous" />
         <Script id="tagManager" async src="https://www.googletagmanager.com/gtag/js?id=G-0ELFHP6WM4" />
 
         <Script id="settingGoogleSettings"
