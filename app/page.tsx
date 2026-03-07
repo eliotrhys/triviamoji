@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion, type Variants } from "framer-motion";
+import DailyChallenge from "../components/DailyChallenge";
 
 const variants: Variants = {
     hidden: { opacity: 0 },
@@ -57,24 +58,37 @@ export default function Page() {
                 <img src="/images/smileys/smiley_clown.png" className="absolute top-0 right-0 corner-smiley hover:scale-125 ease-in-out duration-100" alt="" />
             </motion.div>
             <div className="intro-page bg-blue-500">
+                <div className="hidden xl:flex fixed left-6 top-1/2 -translate-y-1/2 z-20">
+                    <div className="w-36 h-72 bg-white/90 border-4 border-black rounded-lg flex items-center justify-center text-xs text-slate-500 text-center p-2">
+                        Advertisement
+                    </div>
+                </div>
+                <div className="hidden xl:flex fixed right-6 top-1/2 -translate-y-1/2 z-20">
+                    <div className="w-36 h-72 bg-white/90 border-4 border-black rounded-lg flex items-center justify-center text-xs text-slate-500 text-center p-2">
+                        Advertisement
+                    </div>
+                </div>
                 <div className="container mx-auto px-4">
                     <motion.div 
                         animate={{ y: [-800, 0]} } 
                         transition={{ type: "spring", bounce: 0.4, duration: 0.8 }}
-                        className="w-full lg:w-1/2 mx-auto pt-10 mb-10"
+                        className="w-full lg:w-1/2 mx-auto pt-4 lg:pt-6 mb-4 lg:mb-6"
                     >
                         <div className="text-center">
                             <div>
-                                <img alt="Triviamoji Logo" src="/images/horizontalLogo.png" className="main-logo h-auto w-auto mx-auto relative z-20" />
+                                <img alt="Triviamoji Logo" src="/images/horizontalLogo.png" className="main-logo h-auto w-[300px] lg:w-[460px] mx-auto relative z-20" />
                             </div>
-                            <h2 className="text-lg lg:text-2xl mb-4 lg:mb-10 text-white">🧠 The emoji trivia game! 🤓</h2>
+                            <h2 className="text-base lg:text-xl mb-2 lg:mb-4 text-white">🧠 The emoji trivia game! 🤓</h2>
                         </div>
                     </motion.div>
+
+                    <DailyChallenge />
+
                     <div className="grid grid-cols-3 mb-6">
                         <div className="col-span-full lg:col-start-2 lg:col-span-1">
                             <Link href={{ pathname: "/game", query: {isSuddenDeath: "true"}}}  
                             className="text-xl lg:text-xl flex justify-center items-center border-4 border-white ease-in-out duration-100 bg-black rounded-full py-3 lg:py-5 w-100 text-white whitespace-nowrap w-full cursor-pointer animate-bounce shadow-lift">
-                                ☠️ Play Sudden Death ☠️
+                                ☠️ Play Sudden Death Mode ☠️
                             </Link>
                             {highScore !== null && (
                                 <div className="text-center text-white text-sm lg:text-base mt-5">
