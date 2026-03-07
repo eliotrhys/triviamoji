@@ -81,15 +81,24 @@ export default function SideMenu(props: SideMenuProps) {
           </div>
           <Link href={"https://x.com/eliothectorson"} target="_blank" className="flex items-center ease-in-out duration-100 hover:scale-105 mb-8">
             <div>
-              <div className="mr-4 h-8 w-8 bg-black text-white text-base rounded-full flex items-center justify-center border-2 border-white font-black">
-                <span className="relative top-[1px]">X</span>
-              </div>
+              <img src="/images/x-logo.svg" className="mr-4 h-8 w-8" alt="X logo" />
             </div>
             <div>
               <div className="text-xs">Follow me on X</div>
               <div className="text-xs text-slate-300">&#40;I&apos;m smart and funny&#41;</div>
             </div>
           </Link>
+          <div className="mb-6 text-xs space-y-1">
+            <div>
+              <Link href="/privacy-policy" className="underline">Privacy Policy</Link>
+            </div>
+            <div>
+              <Link href="/terms" className="underline">Terms</Link>
+            </div>
+            <div>
+              <Link href="/contact" className="underline">Contact</Link>
+            </div>
+          </div>
           <div className="text-xs">🎨 Illustrations by TECHCROWD</div>
         </div>
       </div>

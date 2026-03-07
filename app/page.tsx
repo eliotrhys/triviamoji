@@ -57,16 +57,6 @@ export default function Page() {
                 <img src="/images/smileys/smiley_clown.png" className="absolute top-0 right-0 corner-smiley hover:scale-125 ease-in-out duration-100" alt="" />
             </motion.div>
             <div className="intro-page bg-blue-500">
-                <Link href={"https://x.com/eliothectorson"} target="_blank" className="flex items-center justify-center ease-in-out duration-100 hover:scale-105 py-6 pr-6 absolute top-0 right-0 hidden md:flex cursor-pointer">
-                    <div>
-                        <div className="mr-4 h-8 w-8 bg-black text-white text-base rounded-full flex items-center justify-center border-2 border-white font-black">
-                            <span className="relative top-[1px]">X</span>
-                        </div>
-                    </div>
-                    <div>
-                        <div className="text-xs text-white">Follow me on X</div>
-                    </div>
-                </Link>
                 <div className="container mx-auto px-4">
                     <motion.div 
                         animate={{ y: [-800, 0]} } 
@@ -172,14 +162,17 @@ export default function Page() {
                 <div>
                     <Link href={"https://x.com/eliothectorson"} target="_blank" className="flex items-center justify-center ease-in-out duration-100 hover:scale-105 py-6 cursor-pointer">
                         <div>
-                            <div className="mr-4 h-8 w-8 bg-black text-white text-base rounded-full flex items-center justify-center border-2 border-white font-black">
-                                <span className="relative top-[1px]">X</span>
-                            </div>
+                            <img src="/images/x-logo.svg" className="mr-4 h-7 w-7" alt="X logo" />
                         </div>
                         <div>
                             <div className="text-xs text-black">Follow me on X</div>
                         </div>
                     </Link>
+                </div>
+                <div className="flex justify-center gap-6 text-xs pb-10">
+                    <Link href="/privacy-policy" className="underline hover:text-blue-500">Privacy Policy</Link>
+                    <Link href="/terms" className="underline hover:text-blue-500">Terms</Link>
+                    <Link href="/contact" className="underline hover:text-blue-500">Contact</Link>
                 </div>
             </div>
         </div>
