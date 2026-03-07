@@ -40,7 +40,7 @@ export default function IntroScreen(props: IntroScreenProps) {
                     { isSuddenDeath ? 
                       <div>
                         <h1 className="huge-emoji">☠️</h1>
-                        <h1 className="text-md lg:text-4xl -mt-10 mb-20 text-red-600">NO SECOND CHANCES</h1>
+                        <h1 className="text-md lg:text-4xl -mt-10 mb-8 lg:mb-10 text-red-600">NO SECOND CHANCES</h1>
                       </div>
                       :
                       <div>
@@ -55,7 +55,7 @@ export default function IntroScreen(props: IntroScreenProps) {
                   animate={{ y: [-800, 0]} } 
                   transition={{ type: "spring", bounce: 0.4, duration: 1.2 }}
                 >
-                  <h1 className={`text-5xl lg:text-9xl mb-10 ${ isSuddenDeath ? "text-red-600" : "text-black" } font-black`}>{ introTimeRemaining }</h1>
+                  <h1 className={`text-5xl lg:text-9xl mb-4 lg:mb-6 ${ isSuddenDeath ? "text-red-600" : "text-black" } font-black`}>{ introTimeRemaining }</h1>
                 </motion.div>
                 <motion.div
                   animate={{ y: [800, 0]} } 

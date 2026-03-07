@@ -110,7 +110,7 @@ a {
   -webkit-transition: 0.3s ease;
   transition: 0.3s ease;
   /* Add right transition */
-  z-index: 11;
+  z-index: 60;
   border-left: 4px solid black;
   overflow: scroll;
 }

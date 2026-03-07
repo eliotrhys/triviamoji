@@ -87,8 +87,9 @@ export default function Page() {
                     <div className="grid grid-cols-3 mb-6">
                         <div className="col-span-full lg:col-start-2 lg:col-span-1">
                             <Link href={{ pathname: "/game", query: {isSuddenDeath: "true"}}}  
-                            className="text-xl lg:text-xl flex justify-center items-center border-4 border-white ease-in-out duration-100 bg-black rounded-full py-3 lg:py-5 w-100 text-white whitespace-nowrap w-full cursor-pointer animate-bounce shadow-lift">
+                            className="text-xl lg:text-xl flex justify-center items-center flex-col border-4 border-white ease-in-out duration-100 bg-black rounded-full py-3 lg:py-5 w-100 text-white whitespace-nowrap w-full cursor-pointer animate-bounce shadow-lift">
                                 ☠️ Play Sudden Death Mode ☠️
+                                <div className="text-xs lg:text-sm text-gray-400">thousands of questions!</div>
                             </Link>
                             {highScore !== null && (
                                 <div className="text-center text-white text-sm lg:text-base mt-5">

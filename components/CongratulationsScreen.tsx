@@ -54,7 +54,7 @@ export default function CongratulationsScreen(props: CongratulationsScreenProps)
 
       return (
         <div className="py-1 px-1 text-black text-sm lg:text-base">
-          High score ({props.isSuddenDeath ? "Sudden Death" : "Timed"}){" "}
+          High score{" "}
           <span className="text-blue-500">
             {highestScoreForGameMode} {highestScoreForGameMode > 1 || highestScoreForGameMode === 0 ? "points" : "point"}
           </span>
@@ -69,6 +69,38 @@ export default function CongratulationsScreen(props: CongratulationsScreenProps)
 
   return (
     <div className="min-h-[calc(100vh-40px)] lg:min-h-[calc(100vh-56px)] min-w-screen text-center relative">
+      <div className="hidden xl:flex fixed left-6 top-1/2 -translate-y-1/2 z-20">
+        <div className="w-36 h-72 bg-white border-4 border-black rounded-lg flex items-center justify-center text-xs text-slate-500 text-center p-2">
+          {shouldRenderFailureAd ? (
+            <ins
+              className="adsbygoogle block w-full h-full"
+              style={{ display: "block" }}
+              data-ad-client="ca-pub-8259590562391591"
+              data-ad-slot={failureAdSlotId}
+              data-ad-format="vertical"
+              data-full-width-responsive="true"
+            />
+          ) : (
+            "Advertisement"
+          )}
+        </div>
+      </div>
+      <div className="hidden xl:flex fixed right-6 top-1/2 -translate-y-1/2 z-20">
+        <div className="w-36 h-72 bg-white border-4 border-black rounded-lg flex items-center justify-center text-xs text-slate-500 text-center p-2">
+          {shouldRenderFailureAd ? (
+            <ins
+              className="adsbygoogle block w-full h-full"
+              style={{ display: "block" }}
+              data-ad-client="ca-pub-8259590562391591"
+              data-ad-slot={failureAdSlotId}
+              data-ad-format="vertical"
+              data-full-width-responsive="true"
+            />
+          ) : (
+            "Advertisement"
+          )}
+        </div>
+      </div>
       <div className="container mx-auto px-4 h-full">
         <div className="grid h-full">
 
@@ -83,12 +115,22 @@ export default function CongratulationsScreen(props: CongratulationsScreenProps)
                   { props.isSuddenDeath ? 
                     <div>
                       <h1 className="huge-emoji -mb-10">☠️</h1>
-                      <h1 className="text-2xl lg:text-5xl mb-0 lg:mb-10 font-black">Oof.</h1>
+                      <h1 className="text-2xl lg:text-5xl mb-2 lg:mb-4 font-black">Oof.</h1>
+                      <div className="mb-4 lg:mb-6">
+                        <span className="bg-black text-white border-4 border-white rounded-md px-3 py-1 inline-block">
+                          ☠️ Sudden Death ☠️
+                        </span>
+                      </div>
                     </div>
                     :
                     <div>
                       <h1 className="huge-emoji -mb-10">💩</h1>
-                      <h1 className="text-2xl lg:text-5xl mb-0 lg:mb-10 font-black">Time&apos;s up!</h1>
+                      <h1 className="text-2xl lg:text-5xl mb-2 lg:mb-4 font-black">Time&apos;s up!</h1>
+                      <div className="mb-4 lg:mb-6">
+                        <span className="bg-white text-black border-4 border-black rounded-md px-3 py-1 inline-block">
+                          ⏰ Timed
+                        </span>
+                      </div>
                     </div>
                   }
                 </motion.div>
@@ -114,9 +156,9 @@ export default function CongratulationsScreen(props: CongratulationsScreenProps)
                       {props.lastIncorrectEmoji && (
                         <div className="text-4xl lg:text-6xl mb-2">{props.lastIncorrectEmoji.replaceAll("/", "")}</div>
                       )}
-                      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-center lg:gap-3">
-                        <span className="text-sm lg:text-base">The answer was</span>
-                        <strong className="text-2xl lg:text-2xl text-blue-500">{props.lastIncorrectAnswer}</strong>
+                      <div className="text-base lg:text-lg text-black">
+                        The answer was
+                        <div className="text-red-500 text-base lg:text-lg">{props.lastIncorrectAnswer}</div>
                       </div>
                     </motion.div>
                   )}
