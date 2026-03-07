@@ -79,12 +79,14 @@ export default function SideMenu(props: SideMenuProps) {
           <div className="">
             { allMediaTypes }
           </div>
-          <Link href={"https://twitter.com/eliothectorson"} target="_blank" className="flex items-center ease-in-out duration-100 hover:scale-105 mb-8">
+          <Link href={"https://x.com/eliothectorson"} target="_blank" className="flex items-center ease-in-out duration-100 hover:scale-105 mb-8">
             <div>
-              <img src="/images/twitter.png" className="mr-4" style={{ height: "24px" }} alt="" />
+              <div className="mr-4 h-8 w-8 bg-black text-white text-base rounded-full flex items-center justify-center border-2 border-white font-black">
+                <span className="relative top-[1px]">X</span>
+              </div>
             </div>
             <div>
-              <div className="text-xs">Follow me on twitter</div>
+              <div className="text-xs">Follow me on X</div>
               <div className="text-xs text-slate-300">&#40;I&apos;m smart and funny&#41;</div>
             </div>
           </Link>

@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { motion, type Variants } from "framer-motion";
 
 const variants: Variants = {
@@ -30,6 +31,16 @@ const animationItem: Variants = {
 }
 
 export default function Page() {
+    const [highScore, setHighScore] = useState<number | null>(null);
+
+    useEffect(() => {
+        if (typeof window === "undefined") {
+            return;
+        }
+
+        const parsedHighScore = parseInt(localStorage.getItem("highestScoreSuddenDeath") ?? "0");
+        setHighScore(parsedHighScore > 0 ? parsedHighScore : null);
+    }, []);
 
     return (
         <div className="min-h-screen min-w-screen relative overflow-x-hidden">
@@ -46,12 +57,14 @@ export default function Page() {
                 <img src="/images/smileys/smiley_clown.png" className="absolute top-0 right-0 corner-smiley hover:scale-125 ease-in-out duration-100" alt="" />
             </motion.div>
             <div className="intro-page bg-blue-500">
-                <Link href={"https://twitter.com/eliothectorson"} target="_blank" className="flex items-center justify-center ease-in-out duration-100 hover:scale-105 py-6 pr-6 absolute top-0 right-0 hidden md:flex cursor-pointer">
+                <Link href={"https://x.com/eliothectorson"} target="_blank" className="flex items-center justify-center ease-in-out duration-100 hover:scale-105 py-6 pr-6 absolute top-0 right-0 hidden md:flex cursor-pointer">
                     <div>
-                        <img src="/images/twitter.png" className="mr-4" style={{ height: "24px" }} alt="" />
+                        <div className="mr-4 h-8 w-8 bg-black text-white text-base rounded-full flex items-center justify-center border-2 border-white font-black">
+                            <span className="relative top-[1px]">X</span>
+                        </div>
                     </div>
                     <div>
-                        <div className="text-xs text-white">Follow me on twitter</div>
+                        <div className="text-xs text-white">Follow me on X</div>
                     </div>
                 </Link>
                 <div className="container mx-auto px-4">
@@ -69,18 +82,15 @@ export default function Page() {
                     </motion.div>
                     <div className="grid grid-cols-3 mb-6">
                         <div className="col-span-full lg:col-start-2 lg:col-span-1">
-                            <Link href={{ pathname: "/game", query: {isSuddenDeath: "false"}}} 
-                            className="text-xl lg:text-xl flex justify-center items-center border-4 border-black ease-in-out duration-100 bg-red-500 hover:bg-red-900 rounded-full py-3 lg:py-5 w-100 text-white whitespace-nowrap animate-bounce w-full cursor-pointer shadow-lift">
-                                Play Timed!
-                            </Link>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-3 mb-6">
-                        <div className="col-span-full lg:col-start-2 lg:col-span-1">
                             <Link href={{ pathname: "/game", query: {isSuddenDeath: "true"}}}  
-                            className="text-xl lg:text-xl flex justify-center items-center border-4 border-white ease-in-out duration-100 bg-black rounded-full py-3 lg:py-5 w-100 text-white whitespace-nowrap w-full cursor-pointer rotate-[-5deg] hover:rotate-[0deg] lift">
+                            className="text-xl lg:text-xl flex justify-center items-center border-4 border-white ease-in-out duration-100 bg-black rounded-full py-3 lg:py-5 w-100 text-white whitespace-nowrap w-full cursor-pointer animate-bounce shadow-lift">
                                 ☠️ Play Sudden Death ☠️
                             </Link>
+                            {highScore !== null && (
+                                <div className="text-center text-white text-sm lg:text-base mt-5">
+                                    your high score is {highScore}
+                                </div>
+                            )}
                         </div>
                     </div>
                     <div className="grid grid-cols-1">
@@ -160,12 +170,14 @@ export default function Page() {
                 </motion.div>
                 
                 <div>
-                    <Link href={"https://twitter.com/eliothectorson"} target="_blank" className="flex items-center justify-center ease-in-out duration-100 hover:scale-105 py-6 cursor-pointer">
+                    <Link href={"https://x.com/eliothectorson"} target="_blank" className="flex items-center justify-center ease-in-out duration-100 hover:scale-105 py-6 cursor-pointer">
                         <div>
-                            <img src="/images/twitter.png" className="mr-4" style={{ height: "24px" }} alt="" />
+                            <div className="mr-4 h-8 w-8 bg-black text-white text-base rounded-full flex items-center justify-center border-2 border-white font-black">
+                                <span className="relative top-[1px]">X</span>
+                            </div>
                         </div>
                         <div>
-                            <div className="text-xs text-black">Follow me on twitter</div>
+                            <div className="text-xs text-black">Follow me on X</div>
                         </div>
                     </Link>
                 </div>

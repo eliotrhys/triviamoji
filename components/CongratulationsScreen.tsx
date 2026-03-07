@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import React from "react";
+import React, { useEffect } from "react";
 import Guess from "../app/types/Guess";
 import Points from "./Points";
 
@@ -9,11 +9,34 @@ interface CongratulationsScreenProps {
   guesses: Guess[];
   count: number;
   isSuddenDeath: boolean;
+  lastIncorrectAnswer: string;
+  lastIncorrectEmoji: string;
+  showFailureAd: boolean;
 }
 
 export default function CongratulationsScreen(props: CongratulationsScreenProps) {
+  const failureAdSlotId = process.env.NEXT_PUBLIC_ADSENSE_FAILURE_SLOT;
+  const shouldRenderFailureAd = props.showFailureAd && Boolean(failureAdSlotId);
 
-  const renderHighestScore = () => {
+  useEffect(() => {
+    if (!shouldRenderFailureAd || typeof window === "undefined") {
+      return;
+    }
+
+    try {
+      const adSlot = document.querySelector("ins.adsbygoogle:not([data-adsbygoogle-status])");
+
+      if (!adSlot) {
+        return;
+      }
+
+      ((window as Window & { adsbygoogle?: unknown[] }).adsbygoogle = (window as Window & { adsbygoogle?: unknown[] }).adsbygoogle || []).push({});
+    } catch (error) {
+      console.error("AdSense failed to render", error);
+    }
+  }, [shouldRenderFailureAd]);
+
+  const renderHighestScoreBlock = () => {
     if (typeof window !== "undefined") 
     {
       let highestScoreForGameMode = 0;
@@ -30,17 +53,12 @@ export default function CongratulationsScreen(props: CongratulationsScreenProps)
       }
 
       return (
-        <motion.div
-          animate={{ x: [-800, 0]} } 
-          transition={{ type: "spring", bounce: 0.4, duration: 1.2 }}
-          className="my-4"
-        >
-          <div className="text-4xl mb-0">🏆</div>
-          <p className="mb-0">Your high score for</p>
-          {props.isSuddenDeath ? <div className="bg-black text-white whitespace-nowrap rounded-md p-2 my-4 border-4 border-white inline-block lift">☠️ Sudden Death</div>
-          : <div className="bg-white text-black whitespace-nowrap rounded-md p-2 my-4 border-4 border-black inline-block lift">⏰ Timed</div>}
-          <p className="mb-0">is {highestScoreForGameMode} {highestScoreForGameMode > 1 || highestScoreForGameMode === 0 ? "points" : "point"}</p>
-        </motion.div>
+        <div className="py-1 px-1 text-black text-sm lg:text-base">
+          High score ({props.isSuddenDeath ? "Sudden Death" : "Timed"}){" "}
+          <span className="text-blue-500">
+            {highestScoreForGameMode} {highestScoreForGameMode > 1 || highestScoreForGameMode === 0 ? "points" : "point"}
+          </span>
+        </div>
       )
     } 
     else 
@@ -76,8 +94,32 @@ export default function CongratulationsScreen(props: CongratulationsScreenProps)
                 </motion.div>
               </div>
 
+              <div className="w-full lg:w-1/3 mx-auto mb-8">
+                <motion.div
+                  animate={{ x: [-800, 0]} } 
+                  transition={{ type: "spring", bounce: 0.4, duration: 1.2 }}
+                >
+                  <button className="px-10 py-4 w-full text-center hover:scale-110 ease-in-out duration-100 border-4 border-black bg-blue-500 hover:bg-blue-700 text-white rounded-full inline-block cursor-pointer shadow-lift" onClick={props.onRestart}>Restart Game</button>
+                </motion.div>
+              </div>
+
               <div className="w-full lg:w-1/3 mx-auto">
                 <div className="mt-10">
+                  { props.lastIncorrectAnswer && (
+                    <motion.div
+                      animate={{ x: [-800, 0]} }
+                      transition={{ type: "spring", bounce: 0.4, duration: 0.7 }}
+                      className="mb-4 bg-white text-black border-4 border-black rounded-lg py-3 px-4"
+                    >
+                      {props.lastIncorrectEmoji && (
+                        <div className="text-4xl lg:text-6xl mb-2">{props.lastIncorrectEmoji.replaceAll("/", "")}</div>
+                      )}
+                      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-center lg:gap-3">
+                        <span className="text-sm lg:text-base">The answer was</span>
+                        <strong className="text-2xl lg:text-2xl text-blue-500">{props.lastIncorrectAnswer}</strong>
+                      </div>
+                    </motion.div>
+                  )}
                     
                   <motion.div className="mb-4 lg:mb-10 bg-white border-black border-4 rounded-lg text-center" 
                     animate={{ x: [-800, 0]} } 
@@ -85,35 +127,44 @@ export default function CongratulationsScreen(props: CongratulationsScreenProps)
                   >
                     <div className="flex items-center justify-center border-b-4 pt-4 pb-4 border-black">
                       <div className="text-4xl">🏅</div>
-                      <h2 className="text-xl lg:text-xl">You scored</h2>
+                      <h2 className="text-xl lg:text-2xl ml-2">
+                        You scored{" "}
+                        <span className="text-blue-500 underline decoration-4 decoration-blue-500 underline-offset-4">
+                          {props.finalScore} {props.finalScore > 1 || props.finalScore === 0 ? "points" : "point"}
+                        </span>
+                      </h2>
                     </div>
                     
                     { props.count > 0 && 
-                      <div className="py-4 lg:py-6 border-black border-b-4">
+                      <div className="py-2 lg:py-3">
                         <Points count={props.count} guesses={props.guesses} />
                       </div>
                     }
-                    
-                    <div className="">
-                      <div className="bg-violet-500 p-4 text-center ">
-                        <h2 className="text-xl lg:text-4xl font-black text-white">{props.finalScore} {props.finalScore > 1 || props.finalScore === 0 ? "points" : "point"}</h2>
-                      </div>
+                    <div className="pt-0 pb-2 px-4">
+                      { renderHighestScoreBlock() }
                     </div>
                   </motion.div>
 
-                  { renderHighestScore() }
+                  {shouldRenderFailureAd && (
+                    <motion.div
+                      animate={{ x: [-800, 0] }}
+                      transition={{ type: "spring", bounce: 0.2, duration: 1.0 }}
+                      className="mb-6 bg-white border-4 border-black rounded-lg p-4"
+                    >
+                      <div className="text-xs mb-2 text-slate-500">Advertisement</div>
+                      <ins
+                        className="adsbygoogle block"
+                        style={{ display: "block", minHeight: "120px" }}
+                        data-ad-client="ca-pub-8259590562391591"
+                        data-ad-slot={failureAdSlotId}
+                        data-ad-format="auto"
+                        data-full-width-responsive="true"
+                      />
+                    </motion.div>
+                  )}
 
                 </div>
               </div>
-            </div>
-
-            <div className="w-full lg:w-1/3 mx-auto mb-10">
-              <motion.div
-                animate={{ x: [-800, 0]} } 
-                transition={{ type: "spring", bounce: 0.4, duration: 1.6 }}
-              >
-                <button className="px-10 py-4 w-full text-center hover:scale-110 ease-in-out duration-100 border-4 border-black bg-blue-500 hover:bg-blue-700 text-white rounded-full inline-block cursor-pointer shadow-lift" onClick={props.onRestart}>Restart Game</button>
-              </motion.div>
             </div>
           </div>
         </div>

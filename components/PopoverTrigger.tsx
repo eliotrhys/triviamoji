@@ -18,8 +18,8 @@ export default function PopoverTrigger(props: PopoverTriggerProps) {
     >
       { 
         props.isCorrect ? 
-        <div className="h-4 w-4 lg:h-8 lg:w-8 p-2 my-1 mx-1 lg:my-2 lg:mx-2 border-4 border-black bg-green-500 rounded-full"></div> :
-        <div className="h-4 w-4 lg:h-8 lg:w-8 p-2 my-1 mx-1 lg:my-2 lg:mx-2 border-4 border-black bg-red-500 rounded-full"></div> 
+        <div className="h-4 w-4 lg:h-8 lg:w-8 my-1 mx-1 lg:my-1 lg:mx-1 border-4 border-black bg-green-500 rounded-full"></div> :
+        <div className="h-4 w-4 lg:h-8 lg:w-8 my-1 mx-1 lg:my-1 lg:mx-1 border-4 border-black bg-red-500 rounded-full"></div> 
       }
         
 

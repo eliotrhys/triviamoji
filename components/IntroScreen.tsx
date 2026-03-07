@@ -65,7 +65,7 @@ export default function IntroScreen(props: IntroScreenProps) {
                     { isSuddenDeath ? 
                       <div>
                         <div className="w-full sm:w-2/3 lg:1/2 mx-auto">
-                          <div className="bg-white border-4 border-black p-4 text-md lg:text-2xl rounded-lg text-center">
+                          <div className="bg-neutral-900 border-4 border-white p-4 text-md lg:text-2xl rounded-lg text-center text-white">
                             <strong className="block mb-3"><span className="text-4xl">💡</span> Did you know?</strong> 
                             <div className="leading-loose">You can disable question categories you don&apos;t like in the <span className="bg-purple-500 text-white rounded-lg px-2 lg:px-4 border-4 border-black py-2 lg:py-4">OPTIONS</span> menu!</div>
                           </div>

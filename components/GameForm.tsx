@@ -42,11 +42,14 @@ export default function GameForm(props: GameFormProps) {
   const [mediaType, setMediaType] = useState("");
   const [acceptableAnswers, setAcceptableAnswers] = useState<string[]>([]);
   const [guesses, setGuesses] = useState<Guess[]>([]);
+  const [lastIncorrectAnswer, setLastIncorrectAnswer] = useState("");
+  const [lastIncorrectEmoji, setLastIncorrectEmoji] = useState("");
 
   // Game states
   const [timeRemaining, setTimeRemaining] = useState(60);
   const [introTimeRemaining, setIntroTimeRemaining] = useState(3);
   const [showIntroScreen, setShowIntroScreen] = useState(true);
+  const [showFailureAd, setShowFailureAd] = useState(false);
 
   const [highestScore, setHighestScore] = useState<number>(
     typeof window !== "undefined" ? parseInt(localStorage.getItem("highestScore") ?? "0") : 0
@@ -60,6 +63,16 @@ export default function GameForm(props: GameFormProps) {
 
   // Shuffle the questions array and store the shuffled array in state
   const [shuffledQuestions, setShuffledQuestions] = useState<Question[]>([]);
+
+  const finalizeGame = useCallback(() => {
+    if (typeof window !== "undefined") {
+      const completedGames = parseInt(localStorage.getItem("completedGamesCount") ?? "0");
+      setShowFailureAd(completedGames >= 1);
+      localStorage.setItem("completedGamesCount", (completedGames + 1).toString());
+    }
+
+    setShowCongratulationsScreen(true);
+  }, []);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -142,15 +155,15 @@ export default function GameForm(props: GameFormProps) {
       setCorrectCount((prevIndex) => prevIndex + 1)
     }
 
-    setGuesses((prevGuesses) => [...prevGuesses, newGuess]);
-
     if (questionIndex === shuffledQuestions.length - 1) {
       // Should never be hit but keep in case
-      setShowCongratulationsScreen(true);
+      finalizeGame();
     } 
     else if (isSuddenDeath && !newGuess.isCorrect)
     {
-      setShowCongratulationsScreen((isShowing) => !isShowing);
+      setLastIncorrectAnswer(title);
+      setLastIncorrectEmoji(emoji);
+      finalizeGame();
     }
     else
     {
@@ -167,7 +180,10 @@ export default function GameForm(props: GameFormProps) {
     setCorrectCount(0);
     setQuestionIndex(0);
     setGuesses([]);
-    setShowCongratulationsScreen((isShowing) => !isShowing);
+    setShowFailureAd(false);
+    setLastIncorrectAnswer("");
+    setLastIncorrectEmoji("");
+    setShowCongratulationsScreen(false);
 
     if (typeof window !== "undefined") 
     {
@@ -193,15 +209,15 @@ export default function GameForm(props: GameFormProps) {
 
   // COUNTDOWN
   const handleCountdownFinish = () => {
-    setShowCongratulationsScreen((isShowing) => !isShowing);
+    finalizeGame();
   }
 
   const handleIntroCountdownStart = () => {
-    setShowIntroScreen((isShowing) => !isShowing);
+    setShowIntroScreen(true);
   }
 
   const handleIntroCountdownFinish = () => {
-    setShowIntroScreen((isShowing) => !isShowing);
+    setShowIntroScreen(false);
     setIntroTimeRemaining(3);
     setTimeRemaining(60);
   }
@@ -236,13 +252,13 @@ export default function GameForm(props: GameFormProps) {
           <>
             <div className="min-h-screen min-w-screen flex flex-col justify-between">
               <Navbar onMenuToggle={handleMenuToggle} />
-              <CongratulationsScreen onRestart={handleRestart} count={count} guesses={guesses} finalScore={guesses.filter((guess) => guess.isCorrect === true).length} isSuddenDeath={isSuddenDeath} />
+              <CongratulationsScreen onRestart={handleRestart} count={count} guesses={guesses} finalScore={guesses.filter((guess) => guess.isCorrect === true).length} isSuddenDeath={isSuddenDeath} lastIncorrectAnswer={lastIncorrectAnswer} lastIncorrectEmoji={lastIncorrectEmoji} showFailureAd={showFailureAd} />
             </div>
           </>
         ) : showIntroScreen ? (
           <>
             <div className="min-h-screen min-w-screen flex flex-col justify-between">
-              <Navbar onMenuToggle={handleMenuToggle} />
+              <Navbar onMenuToggle={handleMenuToggle} isDark={isSuddenDeath} />
               <IntroScreen introTimeRemaining={introTimeRemaining} onIntroTimeTick={handleIntroTimeTick} onCountdownFinish={handleIntroCountdownFinish} isSuddenDeath={isSuddenDeath} />
             </div>
           </>
@@ -271,7 +287,7 @@ export default function GameForm(props: GameFormProps) {
                     </div>
                   </div>
                   <div className="w-full">
-                    <div className="mb-2 lg:mb-4 min-h-24">
+                    <div className="mb-1 lg:mb-2 min-h-12">
                       <Points count={count} guesses={guesses} />
                     </div>
                   </div>

@@ -17,7 +17,7 @@ export default function Points(props: PointsProps) {
   );
 
   return (
-    <div className="min-h-24">
+    <div className="min-h-12">
       <div className="flex justify-center flex-wrap">
         { answers }
       </div>
