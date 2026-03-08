@@ -75,6 +75,7 @@ export default function Page() {
                         className="w-full lg:w-1/2 mx-auto pt-4 lg:pt-6 mb-4 lg:mb-6"
                     >
                         <div className="text-center">
+                            <h1 className="sr-only">Triviamoji Emoji Trivia Game</h1>
                             <div>
                                 <img alt="Triviamoji Logo" src="/images/horizontalLogo.png" className="main-logo h-auto w-[300px] lg:w-[460px] mx-auto relative z-20" />
                             </div>
@@ -185,9 +186,10 @@ export default function Page() {
                     </Link>
                 </div>
                 <div className="flex justify-center gap-6 text-xs pb-10">
+                    <Link href="/about" className="underline hover:text-blue-500">About Us</Link>
                     <Link href="/privacy-policy" className="underline hover:text-blue-500">Privacy Policy</Link>
                     <Link href="/terms" className="underline hover:text-blue-500">Terms</Link>
-                    <Link href="/contact" className="underline hover:text-blue-500">Contact</Link>
+                    <Link href="/contact" className="underline hover:text-blue-500">Contact Us</Link>
                 </div>
             </div>
         </div>

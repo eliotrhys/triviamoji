@@ -1,4 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Terms of Service",
+  description: "Read the Triviamoji terms for acceptable use, content, and liability.",
+  alternates: {
+    canonical: "/terms",
+  },
+};
 
 export default function TermsPage() {
   return (
@@ -36,9 +45,17 @@ export default function TermsPage() {
           accept the updated terms.
         </p>
 
-        <Link className="underline text-blue-500" href="/">
-          Back to Home
-        </Link>
+        <div className="flex flex-wrap gap-4">
+          <Link className="underline text-blue-500" href="/">
+            Back to Home
+          </Link>
+          <Link className="underline text-blue-500" href="/about">
+            About Us
+          </Link>
+          <Link className="underline text-blue-500" href="/contact">
+            Contact Us
+          </Link>
+        </div>
       </div>
     </main>
   );

@@ -1,4 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description: "Read how Triviamoji handles browser storage, analytics, and advertising data.",
+  alternates: {
+    canonical: "/privacy-policy",
+  },
+};
 
 export default function PrivacyPolicyPage() {
   return (
@@ -45,9 +54,17 @@ export default function PrivacyPolicyPage() {
           .
         </p>
 
-        <Link className="underline text-blue-500" href="/">
-          Back to Home
-        </Link>
+        <div className="flex flex-wrap gap-4">
+          <Link className="underline text-blue-500" href="/">
+            Back to Home
+          </Link>
+          <Link className="underline text-blue-500" href="/about">
+            About Us
+          </Link>
+          <Link className="underline text-blue-500" href="/contact">
+            Contact Us
+          </Link>
+        </div>
       </div>
     </main>
   );

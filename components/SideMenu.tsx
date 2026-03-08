@@ -90,13 +90,16 @@ export default function SideMenu(props: SideMenuProps) {
           </Link>
           <div className="mb-6 text-xs space-y-1">
             <div>
+              <Link href="/about" className="underline">About Us</Link>
+            </div>
+            <div>
               <Link href="/privacy-policy" className="underline">Privacy Policy</Link>
             </div>
             <div>
               <Link href="/terms" className="underline">Terms</Link>
             </div>
             <div>
-              <Link href="/contact" className="underline">Contact</Link>
+              <Link href="/contact" className="underline">Contact Us</Link>
             </div>
           </div>
           <div className="text-xs">🎨 Illustrations by TECHCROWD</div>
