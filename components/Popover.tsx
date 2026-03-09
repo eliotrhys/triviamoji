@@ -1,19 +1,15 @@
-import { useEffect, useState } from "react";
-import Guess from "../app/types/Guess";
-
 interface PopoverProps {
   correctAnswer?: string;
   correctAnswerEmoji?: string;
 }
 
-export default function Popover(props: PopoverProps) {
-
+export default function Popover({ correctAnswer, correctAnswerEmoji }: PopoverProps) {
   return (
-    <div className="popover rounded-md z-20">
-      <div className="text-center min-w-[100px]">
-        <div className="whitespace-nowrap text-5xl">{ props.correctAnswerEmoji !== undefined ? props.correctAnswerEmoji.replaceAll('/', '') : "" }</div>
-        <div className="whitespace-nowrap">{ props.correctAnswer }</div>
+    <div className="tm-popover z-20 rounded-2xl">
+      <div className="min-w-[110px] text-center">
+        <div className="text-4xl">{correctAnswerEmoji !== undefined ? correctAnswerEmoji.replaceAll("/", "") : ""}</div>
+        <div className="text-xs font-semibold text-slate-700">{correctAnswer}</div>
       </div>
     </div>
-  )
+  );
 }

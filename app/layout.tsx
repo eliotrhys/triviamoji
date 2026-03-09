@@ -1,11 +1,17 @@
 import '../styles/globals.css';
 import type { Metadata } from "next";
 import Script from "next/script";
+import { Libre_Franklin } from "next/font/google";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://triviamoji.com";
 const siteName = "Triviamoji";
 const description =
   "Triviamoji is an emoji trivia game with thousands of puzzles across movies, TV, books, songs, landmarks, and more.";
+
+const libreFranklin = Libre_Franklin({
+  subsets: ["latin"],
+  variable: "--font-main",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -85,7 +91,7 @@ export default function RootLayout({ children }: { children: any }) {
           }}
         />
       </head>
-      <body className="w-full">{children}</body>
+      <body className={`${libreFranklin.variable} w-full`}>{children}</body>
     </html>
   );
 }

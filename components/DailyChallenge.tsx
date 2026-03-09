@@ -1,15 +1,19 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Question from "../app/types/Question";
 import { questions } from "../data/questions";
+import Keyboard from "./Keyboard";
 
 interface PersistedDailyState {
   dateKey: string;
   guessesUsed: number;
   solved: boolean;
   failed: boolean;
-  hintUsed: boolean;
+  hintUsed?: boolean;
+  hintCategory?: boolean;
+  hintDashes?: boolean;
+  hintLetters?: boolean;
 }
 
 interface PersistedStreakState {
@@ -46,7 +50,7 @@ const getDeterministicIndex = (seed: string, max: number) => {
   return hash % max;
 };
 
-const buildHint = (answer: string, dateKey: string) => {
+const buildHint = (answer: string, dateKey: string, revealCountOverride?: number) => {
   const chars = answer.split("");
   const revealCandidates = chars
     .map((char, index) => ({ char, index }))
@@ -56,7 +60,7 @@ const buildHint = (answer: string, dateKey: string) => {
     return answer;
   }
 
-  const revealCount = revealCandidates.length > 5 ? 2 : 1;
+  const revealCount = revealCountOverride ?? (revealCandidates.length > 5 ? 2 : 1);
   const revealed = new Set<number>();
   let seed = getDeterministicIndex(`${dateKey}-${answer}`, 2147483647);
 
@@ -77,20 +81,26 @@ const buildHint = (answer: string, dateKey: string) => {
     .join("");
 };
 
-const renderPuzzleSlots = (value: string, textColorClass: string) => {
+const buildDashHint = (answer: string) =>
+  answer
+    .split("")
+    .map((char) => (/[a-z0-9]/i.test(char) ? "_" : char))
+    .join("");
+
+const renderPuzzleSlots = (value: string, boxClass: string) => {
   const tokens = value.split(" ");
 
   return (
-    <div className="mb-4 flex justify-center flex-wrap gap-y-4 lg:gap-y-5">
+    <div className="mt-2 flex flex-wrap justify-center gap-2 sm:gap-3">
       {tokens.map((token, tokenIndex) => (
-        <span key={`${token}-${tokenIndex}`} className="inline-flex items-end gap-x-1 mr-4 lg:mr-6">
+        <span key={`${token}-${tokenIndex}`} className="mr-2 inline-flex items-center gap-x-1.5 sm:mr-3">
           {token.split("").map((char, charIndex) => {
             const isAlphaNumeric = /[a-z0-9_]/i.test(char);
 
             if (!isAlphaNumeric) {
               return (
-                <span key={`${char}-${charIndex}`} className={`text-lg lg:text-2xl ${textColorClass}`}>
-                  {char}
+                <span key={`${char}-${charIndex}`} className="tm-underscore-char tm-underscore-char-symbol text-slate-900">
+                  {char.toUpperCase()}
                 </span>
               );
             }
@@ -98,9 +108,9 @@ const renderPuzzleSlots = (value: string, textColorClass: string) => {
             return (
               <span
                 key={`${char}-${charIndex}`}
-                className={`inline-flex items-end justify-center w-4 lg:w-6 h-7 lg:h-9 border-b-4 border-black text-lg lg:text-2xl ${textColorClass}`}
+                className={`tm-underscore-char inline-flex h-11 w-9 items-center justify-center rounded-lg text-slate-900 sm:h-12 sm:w-10 ${boxClass}`}
               >
-                {char === "_" ? "" : char}
+                {char === "_" ? "" : char.toUpperCase()}
               </span>
             );
           })}
@@ -110,19 +120,49 @@ const renderPuzzleSlots = (value: string, textColorClass: string) => {
   );
 };
 
-export default function DailyChallenge() {
+const formatTimeLeft = (secondsLeft: number) => {
+  const hours = Math.floor(secondsLeft / 3600);
+  const minutes = Math.floor((secondsLeft % 3600) / 60);
+  const seconds = secondsLeft % 60;
+
+  if (hours > 0) {
+    return `${hours}h ${String(minutes).padStart(2, "0")}m`;
+  }
+
+  return `${minutes}m ${String(seconds).padStart(2, "0")}s`;
+};
+
+const getSecondsUntilTomorrow = () => {
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(now.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+  return Math.max(0, Math.floor((tomorrow.getTime() - now.getTime()) / 1000));
+};
+
+interface DailyChallengeProps {
+  onHeaderMetaChange?: (meta: { streak: number; nextInLabel: string }) => void;
+}
+
+export default function DailyChallenge({ onHeaderMetaChange }: DailyChallengeProps) {
   const [dailyQuestion, setDailyQuestion] = useState<Question | null>(null);
   const [dateKey, setDateKey] = useState("");
   const [dailyGuess, setDailyGuess] = useState("");
   const [guessesUsed, setGuessesUsed] = useState(0);
   const [isSolved, setIsSolved] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
-  const [hintUsed, setHintUsed] = useState(false);
-  const [showCorrectImage, setShowCorrectImage] = useState(false);
-  const [showWrongImage, setShowWrongImage] = useState(false);
-  const [animationKey, setAnimationKey] = useState<number>(0);
+  const [hintCategory, setHintCategory] = useState(false);
+  const [hintDashes, setHintDashes] = useState(false);
+  const [hintLetters, setHintLetters] = useState(false);
   const [streakCount, setStreakCount] = useState(0);
-  const editableRef = useRef<HTMLDivElement | null>(null);
+  const [secondsUntilTomorrow, setSecondsUntilTomorrow] = useState(0);
+  const [shareMessage, setShareMessage] = useState("");
+  const [emojiGridCopyMessage, setEmojiGridCopyMessage] = useState("");
+  const [feedbackType, setFeedbackType] = useState<"correct" | "wrong" | null>(null);
+  const [feedbackKey, setFeedbackKey] = useState(0);
+  const [lastSubmittedGuess, setLastSubmittedGuess] = useState("");
+  const [lastGuessWasCorrect, setLastGuessWasCorrect] = useState<boolean | null>(null);
+  const latestGuessRef = useRef("");
 
   useEffect(() => {
     const today = getDateKey();
@@ -131,6 +171,7 @@ export default function DailyChallenge() {
 
     setDateKey(today);
     setDailyQuestion(question);
+    setSecondsUntilTomorrow(getSecondsUntilTomorrow());
 
     if (typeof window === "undefined") {
       return;
@@ -138,23 +179,21 @@ export default function DailyChallenge() {
 
     const storedRaw = localStorage.getItem(DAILY_CHALLENGE_STORAGE_KEY);
 
-    if (!storedRaw) {
-      return;
-    }
+    if (storedRaw) {
+      try {
+        const parsed = JSON.parse(storedRaw) as PersistedDailyState;
 
-    try {
-      const parsed = JSON.parse(storedRaw) as PersistedDailyState;
-
-      if (parsed.dateKey !== today) {
-        return;
+        if (parsed.dateKey === today) {
+          setGuessesUsed(parsed.guessesUsed);
+          setIsSolved(parsed.solved);
+          setIsFailed(parsed.failed);
+          setHintCategory(Boolean(parsed.hintCategory));
+          setHintDashes(Boolean(parsed.hintDashes));
+          setHintLetters(Boolean(parsed.hintLetters));
+        }
+      } catch {
+        localStorage.removeItem(DAILY_CHALLENGE_STORAGE_KEY);
       }
-
-      setGuessesUsed(parsed.guessesUsed);
-      setIsSolved(parsed.solved);
-      setIsFailed(parsed.failed);
-      setHintUsed(parsed.hintUsed);
-    } catch {
-      localStorage.removeItem(DAILY_CHALLENGE_STORAGE_KEY);
     }
 
     const streakRaw = localStorage.getItem(DAILY_STREAK_STORAGE_KEY);
@@ -188,28 +227,12 @@ export default function DailyChallenge() {
       if (dateKey && nowDateKey !== dateKey) {
         window.location.reload();
       }
-    }, 60000);
+
+      setSecondsUntilTomorrow(getSecondsUntilTomorrow());
+    }, 1000);
 
     return () => clearInterval(interval);
   }, [dateKey]);
-
-  useEffect(() => {
-    if (isSolved || isFailed) {
-      return;
-    }
-
-    let attempts = 0;
-    const tryFocus = () => {
-      editableRef.current?.focus();
-      attempts += 1;
-
-      if (document.activeElement !== editableRef.current && attempts < 12) {
-        setTimeout(tryFocus, 120);
-      }
-    };
-
-    setTimeout(tryFocus, 0);
-  }, [isSolved, isFailed, dailyQuestion]);
 
   const persistState = (nextState: PersistedDailyState) => {
     if (typeof window === "undefined") {
@@ -219,19 +242,22 @@ export default function DailyChallenge() {
     localStorage.setItem(DAILY_CHALLENGE_STORAGE_KEY, JSON.stringify(nextState));
   };
 
-  const submitDailyGuess = () => {
-    if (!dailyQuestion || isSolved || isFailed || dailyGuess.trim().length === 0) {
+  const submitDailyGuess = (guessOverride?: string) => {
+    const guessValue = (guessOverride ?? latestGuessRef.current).trimEnd();
+
+    if (!dailyQuestion || isSolved || isFailed || guessValue.trim().length === 0) {
       return;
     }
 
-    setShowCorrectImage(false);
-    setShowWrongImage(false);
-
     const isCorrect = dailyQuestion.acceptableAnswers
       .map((answer) => answer.toLowerCase())
-      .includes(dailyGuess.toLowerCase().trimEnd());
+      .includes(guessValue.toLowerCase());
 
     if (isCorrect) {
+      setFeedbackType("correct");
+      setFeedbackKey(Date.now());
+      setLastSubmittedGuess(guessValue);
+      setLastGuessWasCorrect(true);
       let nextStreakCount = 1;
       if (typeof window !== "undefined") {
         const streakRaw = localStorage.getItem(DAILY_STREAK_STORAGE_KEY);
@@ -260,35 +286,28 @@ export default function DailyChallenge() {
 
       setStreakCount(nextStreakCount);
       setIsSolved(true);
-      setShowCorrectImage(true);
-      setAnimationKey(Date.now());
-
+      setShareMessage("");
       persistState({
         dateKey,
         guessesUsed,
         solved: true,
         failed: false,
-        hintUsed,
+        hintCategory,
+        hintDashes,
+        hintLetters,
       });
-      setDailyGuess("");
-      if (editableRef.current) {
-        editableRef.current.textContent = "";
-      }
       return;
     }
 
     const nextGuessesUsed = guessesUsed + 1;
     const nextFailed = nextGuessesUsed >= MAX_DAILY_GUESSES;
 
+    setFeedbackType("wrong");
+    setFeedbackKey(Date.now());
+    setLastSubmittedGuess(guessValue);
+    setLastGuessWasCorrect(false);
     setGuessesUsed(nextGuessesUsed);
     setIsFailed(nextFailed);
-    setShowWrongImage(true);
-    setAnimationKey(Date.now());
-    setDailyGuess("");
-    if (editableRef.current) {
-      editableRef.current.textContent = "";
-    }
-
     if (nextFailed && typeof window !== "undefined") {
       localStorage.setItem(
         DAILY_STREAK_STORAGE_KEY,
@@ -302,171 +321,258 @@ export default function DailyChallenge() {
       guessesUsed: nextGuessesUsed,
       solved: false,
       failed: nextFailed,
-      hintUsed,
+      hintCategory,
+      hintDashes,
+      hintLetters,
     });
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    submitDailyGuess();
-  };
+  const handleCurrentWordChange = useCallback((currentWord: string) => {
+    latestGuessRef.current = currentWord;
+    setDailyGuess(currentWord);
+    if (currentWord.trim().length > 0) {
+      setLastGuessWasCorrect(null);
+    }
+  }, []);
 
-  const handleHintClick = () => {
-    if (!dailyQuestion || hintUsed || isSolved || isFailed) {
+  const activateHint = (hintType: "category" | "dashes" | "letters") => {
+    if (isSolved || isFailed) {
       return;
     }
 
-    setHintUsed(true);
+    const nextCategory = hintType === "category" ? true : hintCategory;
+    const nextDashes = hintType === "dashes" ? true : hintDashes;
+    const nextLetters = hintType === "letters" ? true : hintLetters;
+
+    setHintCategory(nextCategory);
+    setHintDashes(nextDashes);
+    setHintLetters(nextLetters);
     persistState({
       dateKey,
       guessesUsed,
       solved: isSolved,
       failed: isFailed,
-      hintUsed: true,
+      hintCategory: nextCategory,
+      hintDashes: nextDashes,
+      hintLetters: nextLetters,
     });
   };
 
-  const hintText = useMemo(() => {
-    if (!dailyQuestion || !hintUsed) {
-      return null;
+  const shareDailyResult = async () => {
+    if (!dailyQuestion || typeof window === "undefined") {
+      return;
     }
 
-    return buildHint(dailyQuestion.title, dateKey);
-  }, [dailyQuestion, hintUsed, dateKey]);
+    const result = isSolved ? `${guessesUsed + 1}/${MAX_DAILY_GUESSES}` : `X/${MAX_DAILY_GUESSES}`;
+    const emojiLine = isSolved
+      ? "🟩".repeat(Math.min(MAX_DAILY_GUESSES, guessesUsed + 1))
+      : `${"🟥".repeat(guessesUsed)}${"⬜".repeat(Math.max(0, MAX_DAILY_GUESSES - guessesUsed))}`;
 
-  const puzzleText = useMemo(() => {
+    const shareText = `TriviaMoji Daily ${dateKey}\n${result}\n${emojiLine}\n${dailyQuestion.emoji.replaceAll("/", "")}`;
+
+    try {
+      await navigator.clipboard.writeText(shareText);
+      setShareMessage("Result copied to clipboard");
+    } catch {
+      setShareMessage("Unable to copy right now");
+    }
+  };
+
+  const copyEmojiGrid = async () => {
+    if (!dailyQuestion || typeof window === "undefined") {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(copyableResult);
+      setEmojiGridCopyMessage("Emoji grid copied");
+      setTimeout(() => setEmojiGridCopyMessage(""), 1200);
+    } catch {
+      setEmojiGridCopyMessage("Copy failed");
+      setTimeout(() => setEmojiGridCopyMessage(""), 1200);
+    }
+  };
+
+  const hintPattern = useMemo(() => {
     if (!dailyQuestion) {
       return "";
     }
 
+    if (hintLetters) {
+      return buildHint(dailyQuestion.title, dateKey, 2).toUpperCase();
+    }
+
+    if (hintDashes) {
+      return buildDashHint(dailyQuestion.title);
+    }
+
+    return "";
+  }, [dailyQuestion, hintLetters, hintDashes, dateKey]);
+
+  const displayPattern = useMemo(() => {
+    if (isSolved || isFailed) {
+      return dailyQuestion?.title ?? "";
+    }
+
+    if (hintPattern) {
+      return hintPattern;
+    }
+
+    return "";
+  }, [hintPattern, isSolved, isFailed, dailyQuestion]);
+
+  const guessMarkers = useMemo(() => {
+    const markers: Array<"pending" | "correct" | "wrong"> = [];
+
     if (isSolved) {
-      return dailyQuestion.title;
+      for (let i = 0; i < guessesUsed; i += 1) {
+        markers.push("wrong");
+      }
+      markers.push("correct");
+    } else {
+      for (let i = 0; i < guessesUsed; i += 1) {
+        markers.push("wrong");
+      }
     }
 
-    if (isFailed) {
-      return dailyQuestion.title;
+    while (markers.length < MAX_DAILY_GUESSES) {
+      markers.push("pending");
     }
 
-    return hintText ?? "";
-  }, [dailyQuestion, hintText, isFailed, isSolved]);
+    return markers;
+  }, [isSolved, guessesUsed]);
+
+  useEffect(() => {
+    if (!feedbackType) {
+      return;
+    }
+
+    const timer = setTimeout(() => setFeedbackType(null), 1200);
+    return () => clearTimeout(timer);
+  }, [feedbackType]);
+
+  useEffect(() => {
+    onHeaderMetaChange?.({ streak: streakCount, nextInLabel: formatTimeLeft(secondsUntilTomorrow) });
+  }, [streakCount, secondsUntilTomorrow, onHeaderMetaChange]);
 
   if (!dailyQuestion) {
-    return null;
+    return (
+      <section className="tm-card mb-4 p-5 sm:p-6" aria-live="polite">
+        <div className="tm-loading h-5 w-24" />
+        <div className="tm-loading mt-4 h-16 w-full" />
+        <div className="tm-loading mt-4 h-12 w-full" />
+      </section>
+    );
   }
 
+  const dailyEmojiTokens = dailyQuestion.emoji.split("/").filter((token) => token !== "");
+  const guessDisplayText = dailyGuess.trim().length > 0 ? dailyGuess : lastSubmittedGuess;
+  const guessDisplayClass =
+    isSolved || lastGuessWasCorrect === true
+      ? "tm-live-guess-correct"
+      : isFailed || lastGuessWasCorrect === false
+        ? "tm-live-guess-wrong"
+        : "";
+  const displayPatternClass = isSolved ? "bg-emerald-100" : isFailed ? "bg-rose-100" : "bg-[#f1f4f8]";
+  const shareScoreLine = isSolved ? `${guessesUsed + 1}/${MAX_DAILY_GUESSES}` : `X/${MAX_DAILY_GUESSES}`;
+  const shareSquares = isSolved ? "🟩".repeat(Math.min(MAX_DAILY_GUESSES, guessesUsed + 1)) : "🟥".repeat(MAX_DAILY_GUESSES);
+  const shareEmojiLine = dailyQuestion.emoji.replaceAll("/", "");
+  const copyableResult = `TriviaMoji Daily ${dateKey}\n${shareScoreLine}\n${shareSquares}\n${shareEmojiLine}`;
+
   return (
-    <div className="w-full lg:w-1/2 xl:w-2/5 mx-auto mb-8">
-      <div className="bg-white border-4 border-black rounded-lg relative overflow-hidden">
-        <div className="text-center px-4 lg:px-6 pt-4 lg:pt-6 pb-3">
-          <h3 className="text-lg lg:text-2xl">Play Your Daily Challenge</h3>
-          {streakCount > 0 && (
-            <div className="text-xs lg:text-sm text-slate-500 mt-1">your daily streak is {streakCount}</div>
-          )}
-        </div>
-        <div className="w-full border-b-4 border-black" />
-
-        <div className="p-4 lg:p-6 text-center">
-          <div className="text-sm lg:text-lg text-center border-4 border-purple-600 text-purple-600 bg-purple-100 px-4 inline-block rounded-md p-1 mb-4 menuMediaType">
-            {dailyQuestion.mediaType}
+    <section className="mx-auto mb-8 w-full max-w-5xl">
+      <div className="tm-card relative mt-4 p-5 text-center sm:p-6">
+        <div className="mb-5 border-b border-[#dfdfda] pb-4">
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <span className="tm-meta-label">Hints</span>
+            <button type="button" onClick={() => activateHint("category")} disabled={hintCategory || isSolved || isFailed} className="tm-pill tm-pill-action">
+              Show category
+            </button>
+            <button type="button" onClick={() => activateHint("dashes")} disabled={hintDashes || isSolved || isFailed} className="tm-pill tm-pill-action">
+              Show dashes only
+            </button>
+            <button type="button" onClick={() => activateHint("letters")} disabled={hintLetters || isSolved || isFailed} className="tm-pill tm-pill-action">
+              Reveal 2 letters
+            </button>
           </div>
-          <div className="text-4xl lg:text-6xl mb-4">{dailyQuestion.emoji.replaceAll("/", "")}</div>
+        </div>
 
-          {puzzleText && (
-            renderPuzzleSlots(puzzleText, isSolved ? "text-green-600" : isFailed ? "text-red-600" : "text-black")
-          )}
+        {hintCategory && (
+          <div className="mb-3 flex items-center justify-center gap-2">
+            <span className="tm-meta-label">Category</span>
+            <span className="tm-pill tm-pill-primary">{dailyQuestion.mediaType}</span>
+          </div>
+        )}
 
-          <div className="relative">
-            {showCorrectImage && (
-              <div className="absolute -top-16 right-2 lg:-top-20 lg:-right-6 pointer-events-none">
-                <div key={animationKey} className="relative bloom">
-                  <img src="/images/greenBubble.svg" alt="green bubble" className="h-20 lg:h-26 z-10" />
-                  <img src="/images/greenTail.svg" alt="green tail" className="h-20 lg:h-26 z-10 absolute bottom-0 -left-10" />
-                  <div className="text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">Correct!</div>
-                </div>
-              </div>
-            )}
-            {showWrongImage && (
-              <div className="absolute -top-16 right-2 lg:-top-20 lg:-right-6 pointer-events-none">
-                <div key={animationKey} className="relative bloom">
-                  <img src="/images/redBubble.svg" alt="red bubble" className="h-20 lg:h-26 z-10" />
-                  <img src="/images/redTail.svg" alt="red tail" className="h-20 lg:h-26 z-10 absolute bottom-0 -left-10" />
-                  <div className="text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">Wrong!</div>
-                </div>
-              </div>
-            )}
+        <div className="tm-emoji-row">
+          {dailyEmojiTokens.map((token, index) => (
+            <span key={`${token}-${index}`} className="tm-emoji-char">
+              {token}
+            </span>
+          ))}
+        </div>
+        <div className="mt-4 flex items-center justify-center">
+          <span className="tm-pill">
+            <span className="tm-meta-label mr-2">Guesses</span>
+            <span className="tm-guess-markers">
+              {guessMarkers.map((marker, index) => (
+                <span key={index} className={`tm-guess-dot tm-guess-dot-${marker}`}>
+                  {marker === "correct" ? "✓" : marker === "wrong" ? "×" : ""}
+                </span>
+              ))}
+            </span>
+          </span>
+        </div>
+        {!isSolved && !isFailed && (
+          <div className="tm-live-guess-wrap">
+            <div className="tm-live-guess">
+              {guessDisplayText.trim().length > 0 ? (
+                <span className={guessDisplayClass}>{guessDisplayText.toUpperCase()}</span>
+              ) : (
+                <span className="tm-live-placeholder">just start typing your guess!</span>
+              )}
+            </div>
+          </div>
+        )}
+        {displayPattern && renderPuzzleSlots(displayPattern, displayPatternClass)}
 
-            {!isFailed && !isSolved && (
-              <form onSubmit={handleSubmit}>
-                <div className="w-full sm:w-4/5 lg:w-3/4 mx-auto border-4 border-black rounded-full px-4 py-3 text-center text-lg lg:text-2xl mb-3 block relative bg-white">
-                  <div
-                    ref={editableRef}
-                    role="textbox"
-                    aria-label="Daily challenge answer"
-                    contentEditable={!isSolved && !isFailed}
-                    suppressContentEditableWarning
-                    onInput={(event) => {
-                      const nextValue = (event.currentTarget.textContent ?? "").replace(/\n/g, "");
-                      setDailyGuess(nextValue);
-                    }}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter") {
-                        event.preventDefault();
-                        submitDailyGuess();
-                      }
-                    }}
-                    className="outline-none leading-tight min-h-[1.5rem]"
-                  />
-                  {dailyGuess.trim().length === 0 && (
-                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-slate-400 text-lg lg:text-2xl">
-                      Start Typing!
-                    </div>
-                  )}
-                </div>
-                <button
-                  type="submit"
-                  disabled={isSolved || isFailed}
-                  className="w-full sm:w-4/5 lg:w-3/4 mx-auto border-4 border-black bg-blue-500 hover:bg-blue-700 text-white rounded-full py-3 disabled:opacity-60 block"
-                >
-                  Submit Guess
+        {!isSolved && !isFailed && (
+          <div className="mt-5 pt-1">
+            {feedbackType && <div key={feedbackKey} className={`tm-feedback-pop tm-feedback-inline ${feedbackType === "correct" ? "tm-feedback-correct" : "tm-feedback-wrong"}`}>{feedbackType === "correct" ? "Correct!" : "Wrong!"}</div>}
+            <Keyboard handleCurrentWordChange={handleCurrentWordChange} onEnter={() => submitDailyGuess(latestGuessRef.current)} showPreview={false} />
+            <div className="mt-3 text-center text-sm text-slate-500">Press Enter on the keyboard to submit</div>
+          </div>
+        )}
+
+        {(isSolved || isFailed) && (
+          <>
+            <div className={`tm-result-banner tm-result-chip tm-solved-panel mt-5 ${isSolved ? "tm-result-success" : "tm-result-fail"}`}>
+              {isSolved ? "🎉 Puzzle Solved! Amazing work. See you tomorrow." : `😵 Out of guesses. Answer: ${dailyQuestion.title}.`}
+            </div>
+
+            <div className="tm-copy-block mx-auto mt-3 w-full max-w-md rounded-xl border border-[#d9e2ef] bg-[#f8fbff] px-3 py-2 text-sm text-slate-700">
+              <div className="flex items-center justify-between">
+                <span className="font-semibold">Copy Result</span>
+                <button type="button" className="tm-btn-copy-icon" onClick={copyEmojiGrid} aria-label="Copy emoji grid">
+                  📋
                 </button>
-              </form>
-            )}
-          </div>
-
-          {isSolved && (
-            <div className="mt-3 inline-flex items-center gap-3">
-              <div className="border-4 border-green-600 bg-green-100 text-green-700 rounded-lg py-2 px-4 inline-flex items-center gap-2">
-                <span className="text-2xl">👍</span>
-                <span className="font-bold">Nice - you got it!</span>
               </div>
-              <span className="text-xs lg:text-sm text-slate-400">your daily streak is {streakCount}</span>
+              <pre className="mt-1 whitespace-pre-wrap text-left text-base font-medium leading-6">{copyableResult}</pre>
+              {emojiGridCopyMessage && <div className="tm-copy-popover tm-feedback-correct">{emojiGridCopyMessage}</div>}
             </div>
-          )}
-          {isFailed && (
-            <div className="mt-3 inline-flex flex-col items-center gap-2">
-              <div className="border-4 border-red-600 bg-red-100 text-red-700 rounded-lg py-2 px-4 inline-flex items-center gap-2">
-                <span className="text-2xl">☠️</span>
-                <span className="font-bold">Oof. Better luck next time!</span>
-              </div>
-              <span className="text-xs lg:text-sm text-slate-400">your daily streak is {streakCount} - see you tomorrow!</span>
-            </div>
-          )}
 
-          {!isSolved && !isFailed && (
-            <div className="flex items-center justify-between text-xs lg:text-sm text-slate-400 mt-4">
-              <button
-                type="button"
-                onClick={handleHintClick}
-                disabled={hintUsed || isSolved || isFailed}
-                className="underline disabled:opacity-50"
-              >
-                give me a hint
+            <div className="mt-4 flex flex-wrap justify-center gap-2">
+              <button type="button" onClick={shareDailyResult} className="tm-btn-share">
+                Share Result
               </button>
-              <span>{Math.max(0, MAX_DAILY_GUESSES - guessesUsed)} guesses remaining</span>
+              <button type="button" onClick={shareDailyResult} className="tm-btn-copy">
+                Copy Score
+              </button>
+              {shareMessage && <span className="tm-pill">{shareMessage}</span>}
             </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
-    </div>
+    </section>
   );
 }

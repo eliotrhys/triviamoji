@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 
 interface IntroScreenProps {
   introTimeRemaining: number;
@@ -8,13 +8,10 @@ interface IntroScreenProps {
   isSuddenDeath: boolean;
 }
 
-export default function IntroScreen(props: IntroScreenProps) {
-  const { introTimeRemaining, onCountdownFinish, onIntroTimeTick, isSuddenDeath } = props;
-
-  // Countdown timer
+export default function IntroScreen({ introTimeRemaining, onCountdownFinish, onIntroTimeTick, isSuddenDeath }: IntroScreenProps) {
   useEffect(() => {
     const timer = setInterval(() => {
-        onIntroTimeTick();
+      onIntroTimeTick();
     }, 1000);
 
     return () => clearInterval(timer);
@@ -27,67 +24,19 @@ export default function IntroScreen(props: IntroScreenProps) {
   }, [introTimeRemaining, onCountdownFinish]);
 
   return (
-    <div className={`min-h-screen min-w-screen text-center flex items-center justify-center ${ isSuddenDeath ? "bg-black" : "" }`}>
-      <div className="container mx-auto px-4">
-          <div className="flex flex-col justify-between">
-            <div>
-              <div className="w-full">
-                <motion.div
-                  animate={{ y: [-800, 0]} } 
-                  transition={{ type: "spring", bounce: 0.4, duration: 0.8 }}
-                >
-                  <div className="animate-bounce">
-                    { isSuddenDeath ? 
-                      <div>
-                        <h1 className="huge-emoji">☠️</h1>
-                        <h1 className="text-md lg:text-4xl -mt-10 mb-8 lg:mb-10 text-red-600">NO SECOND CHANCES</h1>
-                      </div>
-                      :
-                      <div>
-                        <h1 className="huge-emoji">⏰</h1>
-                        <h1 className="text-md lg:text-4xl -mt-10 mb-20">Let the countdown begin!</h1>
-                      </div>
-                  }
-                    
-                  </div>
-                </motion.div>
-                <motion.div
-                  animate={{ y: [-800, 0]} } 
-                  transition={{ type: "spring", bounce: 0.4, duration: 1.2 }}
-                >
-                  <h1 className={`text-5xl lg:text-9xl mb-4 lg:mb-6 ${ isSuddenDeath ? "text-red-600" : "text-black" } font-black`}>{ introTimeRemaining }</h1>
-                </motion.div>
-                <motion.div
-                  animate={{ y: [800, 0]} } 
-                  transition={{ type: "spring", bounce: 0.4, duration: 0.8 }}
-                >
-                  <div>
-                    { isSuddenDeath ? 
-                      <div>
-                        <div className="w-full sm:w-2/3 lg:1/2 mx-auto">
-                          <div className="bg-neutral-900 border-4 border-white p-4 text-md lg:text-2xl rounded-lg text-center text-white">
-                            <strong className="block mb-3"><span className="text-4xl">💡</span> Did you know?</strong> 
-                            <div className="leading-loose">You can disable question categories you don&apos;t like in the <span className="bg-purple-500 text-white rounded-lg px-2 lg:px-4 border-4 border-black py-2 lg:py-4">OPTIONS</span> menu!</div>
-                          </div>
-                        </div>
-                      </div>
-                      :
-                      <div>
-                        <div className="w-full sm:w-2/3 lg:1/2 mx-auto">
-                          <div className="bg-white border-4 border-black p-4 text-md lg:text-2xl rounded-lg text-center">
-                            <strong className="block mb-3"><span className="text-4xl">💡</span> Did you know?</strong> 
-                            <div className="leading-loose">You can disable question categories you don&apos;t like in the <span className="bg-purple-500 text-white rounded-lg px-2 lg:px-4 border-4 border-black py-2 lg:py-4">OPTIONS</span> menu!</div>
-                          </div>
-                        </div>
-                      </div>
-                  }
-                    
-                  </div>
-                </motion.div>
-              </div>
-          </div>
-        </div>
-      </div>
+    <div className="tm-card mx-auto mt-8 max-w-3xl p-8 text-center sm:p-10">
+      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">{isSuddenDeath ? "Sudden Death" : "Timed Challenge"}</p>
+      <h2 className="tm-title mt-3 text-3xl sm:text-5xl">{isSuddenDeath ? "One mistake ends your run" : "Race the clock"}</h2>
+      <motion.div
+        key={introTimeRemaining}
+        initial={{ opacity: 0.4, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.2 }}
+        className="mt-5 text-6xl font-black text-sky-600 sm:text-8xl"
+      >
+        {introTimeRemaining}
+      </motion.div>
+      <p className="mt-4 text-sm text-slate-600">You can customize categories in Options.</p>
     </div>
   );
 }

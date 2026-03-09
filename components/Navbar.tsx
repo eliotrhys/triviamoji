@@ -2,30 +2,30 @@ import Link from "next/link";
 
 interface NavbarProps {
   onMenuToggle: () => void;
-  isDark?: boolean;
+  modeLabel?: string;
+  dateLabel?: string;
 }
 
-export default function Navbar(props: NavbarProps) {
-
-  const handleClose = () => {
-    props.onMenuToggle();
-  };
-
+export default function Navbar({ onMenuToggle, modeLabel = "Daily Puzzle", dateLabel }: NavbarProps) {
   return (
-    <div className="">
-      <div className={`px-4 pt-0 lg:pt-4 flex items-center justify-between ${props.isDark ? "bg-black" : ""}`}>
-        <div>
-          <Link href="/">
-            <img alt="Horizontal Logo" className={`horizontalLogo ${props.isDark ? "brightness-0 invert" : ""}`} src="/images/horizontalLogo.png" />
-          </Link>
-        </div>
-          <div>
-            <button className="flex items-center" onClick={handleClose}>
-              <div className={`border-2 lg:border-4 h-5 w-5 lg:h-10 lg:w-10 p-2 flex items-center justify-center text-sm lg:text-xl rounded-full ease-in-out duration-100 mr-2 ${props.isDark ? "border-white text-white bg-black hover:bg-blue-500" : "border-black text-black bg-white hover:text-white hover:bg-blue-500"} lift`}>{"<"}</div>
-              <div className={`text-xs md:text-sm lg:text-lg ${props.isDark ? "text-white" : "text-black"}`}>Options</div>
-            </button>
-          </div>
+    <header className="mx-auto mb-3 mt-1 flex w-full max-w-5xl items-center justify-between py-1 sm:py-2">
+      <div className="flex items-center gap-3">
+        <Link href="/">
+          <img src="/images/horizontalLogo.png" alt="TriviaMoji" className="h-10 w-auto sm:h-12" />
+        </Link>
+        <p className="text-sm text-slate-600 sm:text-base">
+          {modeLabel}
+          {dateLabel ? ` • ${dateLabel}` : ""}
+        </p>
       </div>
-    </div>
-  )
+      <div className="flex items-center gap-2">
+        <Link href="/" className="tm-link-chip text-sm">
+          ❓ How to play
+        </Link>
+        <button type="button" className="tm-btn-ghost" onClick={onMenuToggle}>
+          Options
+        </button>
+      </div>
+    </header>
+  );
 }
