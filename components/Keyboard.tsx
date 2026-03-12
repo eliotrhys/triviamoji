@@ -116,16 +116,16 @@ export default function Keyboard({ handleCurrentWordChange, onEnter, showPreview
           {currentWord === "" ? <span className="tm-keyboard-placeholder">Start typing your guess...</span> : currentWord}
         </div>
       )}
-      <div className="space-y-1">
+      <div className="tm-keyboard-wrap space-y-1">
         {keyboardLayout.map((row, rowIndex) => (
-          <div className="flex items-center justify-center gap-1" key={rowIndex}>
+          <div className="tm-kb-row flex items-center justify-center gap-1" key={rowIndex}>
             {row.map((letter) => (
               <Key key={letter} letter={letter} onClick={handleKeyPress} keyIsActive={keyIsActive} pressedKey={pressedKey} isFullWidth={false} />
             ))}
           </div>
         ))}
       </div>
-      <div className="mx-auto mt-1 grid max-w-[340px] grid-cols-3 gap-1">
+      <div className="tm-kb-space-row mx-auto mt-1 grid grid-cols-3 gap-1">
         {keyboardControls.map((letter) => (
           <div key={letter} className="col-span-1 col-start-2 w-full">
             <Key key={letter} letter={letter} onClick={handleKeyPress} keyIsActive={keyIsActive} pressedKey={pressedKey} isFullWidth={true} />

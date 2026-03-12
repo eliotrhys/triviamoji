@@ -29,7 +29,7 @@ export default function Key({ letter, onClick, keyIsActive, pressedKey, isFullWi
   return (
     <button
       type="button"
-      className={`tm-key ${isPressed || isActive || isSpacebarPressed ? "tm-key-active" : ""} ${isFullWidth ? "w-full" : ""} ${letter.toUpperCase() === "ENTER" ? "px-2 text-[11px] sm:text-xs" : ""}`}
+      className={`tm-key ${isPressed || isActive || isSpacebarPressed ? "tm-key-active" : ""} ${isFullWidth ? "w-full" : ""} ${letter.toUpperCase() === "ENTER" ? "px-2 text-sm sm:text-xs" : ""}`}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       onFocus={() => setIsActive(true)}

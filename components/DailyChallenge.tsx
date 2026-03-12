@@ -504,7 +504,7 @@ export default function DailyChallenge({ onHeaderMetaChange }: DailyChallengePro
               Show category
             </button>
             <button type="button" onClick={() => activateHint("dashes")} disabled={hintDashes || isSolved || isFailed} className="tm-pill tm-pill-action">
-              Show dashes only
+              Show answer outline
             </button>
             <button type="button" onClick={() => activateHint("letters")} disabled={hintLetters || isSolved || isFailed} className="tm-pill tm-pill-action">
               Reveal 2 letters

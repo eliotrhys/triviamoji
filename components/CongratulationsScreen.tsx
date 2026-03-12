@@ -96,8 +96,8 @@ export default function CongratulationsScreen({
         animate={{ opacity: 1, y: 0 }}
         className="tm-card p-6 text-center sm:p-7"
       >
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Game Over</p>
-        <h1 className="tm-title mt-2 text-3xl sm:text-4xl">{isSuddenDeath ? "GAME OVER" : "Time Up"}</h1>
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">UH OH!</p>
+        <h1 className="tm-title mt-2 text-3xl sm:text-4xl">{isSuddenDeath ? "☠️ GAME OVER ☠️" : "Time Up"}</h1>
 
         <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
           <span className="tm-pill tm-pill-primary">
