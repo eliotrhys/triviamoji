@@ -12,7 +12,7 @@ export default function Navbar({ onMenuToggle, modeLabel = "Daily Puzzle", dateL
     <header className="mx-auto mb-3 mt-1 flex w-full max-w-5xl items-center justify-between py-1 sm:py-2">
       <div className="flex items-center gap-3">
         <Link href="/">
-          <img src="/images/horizontalLogo.png" alt="TriviaMoji" className="h-10 w-auto sm:h-12" />
+          <img src="/images/triviamojilogo.png" alt="TriviaMoji logo" className="h-14 w-auto sm:h-16 md:h-[4.5rem]" />
         </Link>
         <p className="tm-nav-subtitle text-sm text-slate-600 sm:text-base">
           {modeLabel}

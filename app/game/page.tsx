@@ -3,6 +3,7 @@ import Link from "next/link";
 import AppShell from "../../components/AppShell";
 import GameForm from "../../components/GameForm";
 import DarkModeToggle from "../../components/DarkModeToggle";
+import MailingListButton from "../../components/MailingListButton";
 
 export const metadata: Metadata = {
   title: "Play Emoji Trivia",
@@ -22,9 +23,11 @@ export default function Page() {
       <GameForm isSuddenDeath={isSuddenDeath} />
       <footer className="tm-footer mx-auto mt-6 flex max-w-3xl flex-wrap justify-center gap-x-5 gap-y-2 pb-4 text-sm text-slate-700">
         <DarkModeToggle />
-        <a href="https://x.com/eliothectorson" target="_blank" rel="noreferrer" className="tm-link-chip tm-pill-hover">
-          𝕏 Follow @eliothectorson
+        <a href="https://x.com/eliothectorson" target="_blank" rel="noreferrer" className="tm-link-chip tm-pill-hover inline-flex items-center gap-2">
+          <img src="/images/blurryface_small.jpg" alt="Profile photo for @eliothectorson on X" className="h-5 w-5 rounded-full object-cover" />
+          <span>𝕏 Follow @eliothectorson</span>
         </a>
+        <MailingListButton />
         <Link href="/about" className="tm-link">
           About
         </Link>

@@ -6,6 +6,7 @@ import DailyChallenge from "../components/DailyChallenge";
 import AppShell from "../components/AppShell";
 import HowToPlayModal from "../components/HowToPlayModal";
 import DarkModeToggle from "../components/DarkModeToggle";
+import MailingListButton from "../components/MailingListButton";
 
 export default function Page() {
   const topBannerSlotId = process.env.NEXT_PUBLIC_ADSENSE_TOP_BANNER_SLOT;
@@ -36,7 +37,7 @@ export default function Page() {
         <section className="tm-hero mx-auto mb-2 w-full max-w-5xl py-2 sm:py-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-3">
-              <img src="/images/horizontalLogo.png" alt="TriviaMoji" className="h-10 w-auto sm:h-12" />
+              <img src="/images/triviamojilogo.png" alt="TriviaMoji logo" className="h-14 w-auto sm:h-16 md:h-[4.5rem]" />
               <p className="text-sm text-slate-600 sm:text-base">Daily Puzzle • {displayDate}</p>
             </div>
             <div className="flex items-center gap-2">
@@ -86,9 +87,11 @@ export default function Page() {
 
         <footer className="tm-footer mx-auto mt-6 flex max-w-3xl flex-wrap justify-center gap-x-5 gap-y-2 pb-4 text-sm text-slate-700">
           <DarkModeToggle />
-          <a href="https://x.com/eliothectorson" target="_blank" rel="noreferrer" className="tm-link-chip tm-pill-hover">
-            𝕏 Follow @eliothectorson
+          <a href="https://x.com/eliothectorson" target="_blank" rel="noreferrer" className="tm-link-chip tm-pill-hover inline-flex items-center gap-2">
+            <img src="/images/blurryface_small.jpg" alt="Profile photo for @eliothectorson on X" className="h-5 w-5 rounded-full object-cover" />
+            <span>𝕏 Follow @eliothectorson</span>
           </a>
+          <MailingListButton />
           <Link href="/about" className="tm-link">
             About
           </Link>

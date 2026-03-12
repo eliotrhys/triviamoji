@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { MediaType } from "../app/types/MediaType";
 import DarkModeToggle from "./DarkModeToggle";
+import MailingListButton from "./MailingListButton";
 
 interface SideMenuProps {
   isOpen: boolean;
@@ -71,9 +72,11 @@ export default function SideMenu({ isOpen, onMenuToggle, onCheckboxChange }: Sid
         <div className="mt-6 space-y-2 text-sm text-slate-700">
           <div className="flex flex-wrap items-center gap-2">
             <DarkModeToggle />
-            <a href="https://x.com/eliothectorson" target="_blank" rel="noreferrer" className="tm-link-chip tm-pill-hover">
-              𝕏 Follow @eliothectorson
+            <a href="https://x.com/eliothectorson" target="_blank" rel="noreferrer" className="tm-link-chip tm-pill-hover inline-flex items-center gap-2">
+              <img src="/images/blurryface_small.jpg" alt="Profile photo for @eliothectorson on X" className="h-5 w-5 rounded-full object-cover" />
+              <span>𝕏 Follow @eliothectorson</span>
             </a>
+            <MailingListButton />
           </div>
           <Link href="/about" className="tm-link block">
             About
