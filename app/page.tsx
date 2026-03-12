@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import DailyChallenge from "../components/DailyChallenge";
 import AppShell from "../components/AppShell";
 import HowToPlayModal from "../components/HowToPlayModal";
+import DarkModeToggle from "../components/DarkModeToggle";
 
 export default function Page() {
   const topBannerSlotId = process.env.NEXT_PUBLIC_ADSENSE_TOP_BANNER_SLOT;
@@ -20,14 +21,6 @@ export default function Page() {
     const parsedHighScore = parseInt(localStorage.getItem("highestScoreSuddenDeath") ?? "0", 10);
     setHighScore(parsedHighScore > 0 ? parsedHighScore : null);
   }, []);
-
-  const highScoreLabel = useMemo(() => {
-    if (highScore === null) {
-      return "No high score yet";
-    }
-
-    return `High score: ${highScore}`;
-  }, [highScore]);
 
   const displayDate = useMemo(() => {
     return new Date().toLocaleDateString("en-GB", {
@@ -47,9 +40,13 @@ export default function Page() {
               <p className="text-sm text-slate-600 sm:text-base">Daily Puzzle • {displayDate}</p>
             </div>
             <div className="flex items-center gap-2">
-              <span className="tm-pill">🔥 Streak {dailyHeaderMeta.streak}</span>
-              <span className="tm-pill">🕒 Next in {dailyHeaderMeta.nextInLabel}</span>
-              <button type="button" onClick={() => setIsHowToPlayOpen(true)} className="tm-link-chip text-sm">
+              <span className="tm-pill tm-pill-hover">
+                🔥 Streak <span className="tm-pill-number">{dailyHeaderMeta.streak}</span>
+              </span>
+              <span className="tm-pill tm-pill-hover">
+                🕒 Next in <span className="tm-pill-number tm-pill-number-wide">{dailyHeaderMeta.nextInLabel}</span>
+              </span>
+              <button type="button" onClick={() => setIsHowToPlayOpen(true)} className="tm-link-chip tm-pill-hover text-sm">
                 ❓ How to play
               </button>
             </div>
@@ -60,14 +57,20 @@ export default function Page() {
 
         <section className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-3">
           <div className="tm-sd-promo rounded-2xl p-5 pb-7 text-white lg:col-span-2">
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Sudden Death</div>
-            <h2 className="tm-title mt-2 text-4xl text-white sm:text-5xl">Unlimited Emoji Puzzles</h2>
-            <p className="mt-2 text-lg text-red-300 sm:text-2xl">One wrong guess and your run is over.</p>
+            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-red-600">The Ultimate Emoji Gauntlet</div>
+            <h2 className="tm-title mt-2 text-4xl text-white sm:text-5xl">☠️ Play Sudden Death ☠️</h2>
+            <p className="mt-2 text-lg text-white sm:text-2xl">One wrong guess and your run is <span className="font-bold text-red-600">over.</span></p>
             <div className="mt-4 flex flex-wrap items-center gap-2">
               <Link href="/game" className="tm-btn-danger">
                 Play Sudden Death
               </Link>
-              <span className="tm-pill">{highScoreLabel}</span>
+              {highScore === null ? (
+                <span className="tm-pill tm-pill-on-dark tm-pill-hover">No high score yet</span>
+              ) : (
+                <span className="tm-pill tm-pill-on-dark tm-pill-hover">
+                  High score <span className="tm-pill-number tm-pill-number-on-dark">{highScore}</span>
+                </span>
+              )}
             </div>
           </div>
 
@@ -81,7 +84,11 @@ export default function Page() {
           </div>
         </section>
 
-        <footer className="mx-auto mt-6 flex max-w-3xl flex-wrap justify-center gap-x-5 gap-y-2 pb-4 text-sm text-slate-700">
+        <footer className="tm-footer mx-auto mt-6 flex max-w-3xl flex-wrap justify-center gap-x-5 gap-y-2 pb-4 text-sm text-slate-700">
+          <DarkModeToggle />
+          <a href="https://x.com/eliothectorson" target="_blank" rel="noreferrer" className="tm-link-chip tm-pill-hover">
+            𝕏 Follow @eliothectorson
+          </a>
           <Link href="/about" className="tm-link">
             About
           </Link>

@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Question from "../app/types/Question";
 import { questions } from "../data/questions";
 import Keyboard from "./Keyboard";
+import GameSurface from "./GameSurface";
+import ConfettiBurst from "./ConfettiBurst";
 
 interface PersistedDailyState {
   dateKey: string;
@@ -108,7 +110,7 @@ const renderPuzzleSlots = (value: string, boxClass: string) => {
             return (
               <span
                 key={`${char}-${charIndex}`}
-                className={`tm-underscore-char inline-flex h-11 w-9 items-center justify-center rounded-lg text-slate-900 sm:h-12 sm:w-10 ${boxClass}`}
+                className={`tm-underscore-char tm-slot-char inline-flex h-11 w-9 items-center justify-center rounded-lg sm:h-12 sm:w-10 ${boxClass}`}
               >
                 {char === "_" ? "" : char.toUpperCase()}
               </span>
@@ -138,6 +140,16 @@ const getSecondsUntilTomorrow = () => {
   tomorrow.setDate(now.getDate() + 1);
   tomorrow.setHours(0, 0, 0, 0);
   return Math.max(0, Math.floor((tomorrow.getTime() - now.getTime()) / 1000));
+};
+
+const getEmojiRowClass = (count: number) => {
+  if (count <= 3) {
+    return "tm-emoji-row-few";
+  }
+  if (count <= 5) {
+    return "tm-emoji-row-mid";
+  }
+  return "tm-emoji-row-many";
 };
 
 interface DailyChallengeProps {
@@ -466,6 +478,7 @@ export default function DailyChallenge({ onHeaderMetaChange }: DailyChallengePro
   }
 
   const dailyEmojiTokens = dailyQuestion.emoji.split("/").filter((token) => token !== "");
+  const emojiRowClass = getEmojiRowClass(dailyEmojiTokens.length);
   const guessDisplayText = dailyGuess.trim().length > 0 ? dailyGuess : lastSubmittedGuess;
   const guessDisplayClass =
     isSolved || lastGuessWasCorrect === true
@@ -473,16 +486,18 @@ export default function DailyChallenge({ onHeaderMetaChange }: DailyChallengePro
       : isFailed || lastGuessWasCorrect === false
         ? "tm-live-guess-wrong"
         : "";
-  const displayPatternClass = isSolved ? "bg-emerald-100" : isFailed ? "bg-rose-100" : "bg-[#f1f4f8]";
+  const displayPatternClass = isSolved ? "tm-slot-success" : isFailed ? "tm-slot-fail" : "tm-slot-neutral";
   const shareScoreLine = isSolved ? `${guessesUsed + 1}/${MAX_DAILY_GUESSES}` : `X/${MAX_DAILY_GUESSES}`;
   const shareSquares = isSolved ? "🟩".repeat(Math.min(MAX_DAILY_GUESSES, guessesUsed + 1)) : "🟥".repeat(MAX_DAILY_GUESSES);
   const shareEmojiLine = dailyQuestion.emoji.replaceAll("/", "");
   const copyableResult = `TriviaMoji Daily ${dateKey}\n${shareScoreLine}\n${shareSquares}\n${shareEmojiLine}`;
 
   return (
-    <section className="mx-auto mb-8 w-full max-w-5xl">
-      <div className="tm-card relative mt-4 p-5 text-center sm:p-6">
-        <div className="mb-5 border-b border-[#dfdfda] pb-4">
+    <GameSurface
+      mode="daily"
+      className="mb-6"
+      hintsRow={
+        !isSolved && !isFailed ? (
           <div className="flex flex-wrap items-center justify-center gap-2">
             <span className="tm-meta-label">Hints</span>
             <button type="button" onClick={() => activateHint("category")} disabled={hintCategory || isSolved || isFailed} className="tm-pill tm-pill-action">
@@ -495,24 +510,28 @@ export default function DailyChallenge({ onHeaderMetaChange }: DailyChallengePro
               Reveal 2 letters
             </button>
           </div>
-        </div>
-
-        {hintCategory && (
+        ) : undefined
+      }
+      categoryRow={
+        hintCategory || isSolved ? (
           <div className="mb-3 flex items-center justify-center gap-2">
             <span className="tm-meta-label">Category</span>
-            <span className="tm-pill tm-pill-primary">{dailyQuestion.mediaType}</span>
+            <span className="tm-pill tm-pill-primary tm-pill-hover tm-pill-category">{dailyQuestion.mediaType}</span>
           </div>
-        )}
-
-        <div className="tm-emoji-row">
+        ) : undefined
+      }
+      emojiRow={
+        <div className={`tm-emoji-row ${emojiRowClass}`}>
           {dailyEmojiTokens.map((token, index) => (
             <span key={`${token}-${index}`} className="tm-emoji-char">
               {token}
             </span>
           ))}
         </div>
+      }
+      guessesRow={
         <div className="mt-4 flex items-center justify-center">
-          <span className="tm-pill">
+          <span className="tm-pill tm-pill-hover">
             <span className="tm-meta-label mr-2">Guesses</span>
             <span className="tm-guess-markers">
               {guessMarkers.map((marker, index) => (
@@ -523,8 +542,16 @@ export default function DailyChallenge({ onHeaderMetaChange }: DailyChallengePro
             </span>
           </span>
         </div>
-        {!isSolved && !isFailed && (
-          <div className="tm-live-guess-wrap">
+      }
+      guessDisplay={
+        !isSolved && !isFailed ? (
+          <div className="tm-live-guess-wrap relative">
+            {feedbackType && (
+              <div key={feedbackKey} className={`tm-feedback-pop tm-feedback-overlay ${feedbackType === "correct" ? "tm-feedback-correct" : "tm-feedback-wrong"}`}>
+                {feedbackType === "correct" ? "Correct!" : "Wrong!"}
+              </div>
+            )}
+            {feedbackType === "correct" && <ConfettiBurst />}
             <div className="tm-live-guess">
               {guessDisplayText.trim().length > 0 ? (
                 <span className={guessDisplayClass}>{guessDisplayText.toUpperCase()}</span>
@@ -533,18 +560,19 @@ export default function DailyChallenge({ onHeaderMetaChange }: DailyChallengePro
               )}
             </div>
           </div>
-        )}
-        {displayPattern && renderPuzzleSlots(displayPattern, displayPatternClass)}
-
-        {!isSolved && !isFailed && (
+        ) : undefined
+      }
+      patternRow={displayPattern ? renderPuzzleSlots(displayPattern, displayPatternClass) : undefined}
+      inputArea={
+        !isSolved && !isFailed ? (
           <div className="mt-5 pt-1">
-            {feedbackType && <div key={feedbackKey} className={`tm-feedback-pop tm-feedback-inline ${feedbackType === "correct" ? "tm-feedback-correct" : "tm-feedback-wrong"}`}>{feedbackType === "correct" ? "Correct!" : "Wrong!"}</div>}
             <Keyboard handleCurrentWordChange={handleCurrentWordChange} onEnter={() => submitDailyGuess(latestGuessRef.current)} showPreview={false} />
             <div className="mt-3 text-center text-sm text-slate-500">Press Enter on the keyboard to submit</div>
           </div>
-        )}
-
-        {(isSolved || isFailed) && (
+        ) : undefined
+      }
+      resultArea={
+        isSolved || isFailed ? (
           <>
             <div className={`tm-result-banner tm-result-chip tm-solved-panel mt-5 ${isSolved ? "tm-result-success" : "tm-result-fail"}`}>
               {isSolved ? "🎉 Puzzle Solved! Amazing work. See you tomorrow." : `😵 Out of guesses. Answer: ${dailyQuestion.title}.`}
@@ -563,16 +591,16 @@ export default function DailyChallenge({ onHeaderMetaChange }: DailyChallengePro
 
             <div className="mt-4 flex flex-wrap justify-center gap-2">
               <button type="button" onClick={shareDailyResult} className="tm-btn-share">
-                Share Result
+                ↗ Share Result
               </button>
               <button type="button" onClick={shareDailyResult} className="tm-btn-copy">
-                Copy Score
+                ⧉ Copy Score
               </button>
               {shareMessage && <span className="tm-pill">{shareMessage}</span>}
             </div>
           </>
-        )}
-      </div>
-    </section>
+        ) : undefined
+      }
+    />
   );
 }

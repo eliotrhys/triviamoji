@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { ChangeEvent, useState } from "react";
+import { useEffect, useState } from "react";
 import { MediaType } from "../app/types/MediaType";
+import DarkModeToggle from "./DarkModeToggle";
 
 interface SideMenuProps {
   isOpen: boolean;
@@ -9,11 +10,9 @@ interface SideMenuProps {
 }
 
 export default function SideMenu({ isOpen, onMenuToggle, onCheckboxChange }: SideMenuProps) {
-  const [checkedMediaTypes, setCheckedMediaTypes] = useState<MediaType[]>(() => {
-    if (typeof window === "undefined") {
-      return [];
-    }
+  const [checkedMediaTypes, setCheckedMediaTypes] = useState<MediaType[]>([]);
 
+  useEffect(() => {
     let savedCheckedItems = JSON.parse(localStorage.getItem("checkedItems") || "[]") as MediaType[];
 
     if (savedCheckedItems.length === 0) {
@@ -21,15 +20,13 @@ export default function SideMenu({ isOpen, onMenuToggle, onCheckboxChange }: Sid
       localStorage.setItem("checkedItems", JSON.stringify(savedCheckedItems));
     }
 
-    return savedCheckedItems;
-  });
+    setCheckedMediaTypes(savedCheckedItems);
+  }, []);
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const isChecked = event.target.checked;
-    const value = event.target.value as MediaType;
-
+  const handleToggle = (mediaType: MediaType) => {
     setCheckedMediaTypes((prevState) => {
-      const nextState = !isChecked ? [...prevState, value] : prevState.filter((type) => type !== value);
+      const isDisabled = prevState.includes(mediaType);
+      const nextState = isDisabled ? prevState.filter((type) => type !== mediaType) : [...prevState, mediaType];
       onCheckboxChange(nextState);
       return nextState;
     });
@@ -51,17 +48,33 @@ export default function SideMenu({ isOpen, onMenuToggle, onCheckboxChange }: Sid
 
         <div className="space-y-2">
           {Object.values(MediaType).map((mediaType) => {
-            const isChecked = checkedMediaTypes.includes(mediaType);
+            const isDisabled = checkedMediaTypes.includes(mediaType);
+            const isEnabled = !isDisabled;
             return (
-              <label key={mediaType} className="flex items-center justify-between rounded-2xl border border-slate-200 px-3 py-2 text-sm">
+              <div key={mediaType} className="flex items-center justify-between rounded-2xl border border-slate-200 px-3 py-2 text-sm">
                 <span>{mediaType}</span>
-                <input type="checkbox" value={mediaType} checked={!isChecked} onChange={handleChange} className="h-4 w-4" />
-              </label>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={isEnabled}
+                  aria-label={`${mediaType} ${isEnabled ? "enabled" : "disabled"}`}
+                  onClick={() => handleToggle(mediaType)}
+                  className={`tm-toggle ${isEnabled ? "tm-toggle-on" : "tm-toggle-off"}`}
+                >
+                  <span className="tm-toggle-thumb" />
+                </button>
+              </div>
             );
           })}
         </div>
 
         <div className="mt-6 space-y-2 text-sm text-slate-700">
+          <div className="flex flex-wrap items-center gap-2">
+            <DarkModeToggle />
+            <a href="https://x.com/eliothectorson" target="_blank" rel="noreferrer" className="tm-link-chip tm-pill-hover">
+              𝕏 Follow @eliothectorson
+            </a>
+          </div>
           <Link href="/about" className="tm-link block">
             About
           </Link>

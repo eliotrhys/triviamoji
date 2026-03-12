@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import Counter from "./Counter";
-import EmojiDisplay from "./EmojiDisplay";
 import GuessInput from "./GuessInput";
 import Countdown from "./Countdown";
 import Points from "./Points";
@@ -11,6 +10,7 @@ import CongratulationsScreen from "./CongratulationsScreen";
 import SideMenu from "./SideMenu";
 import IntroScreen from "./IntroScreen";
 import Navbar from "./Navbar";
+import GameSurface from "./GameSurface";
 
 import { questions } from "../data/questions";
 import shuffle from "../app/utils/shuffle";
@@ -22,6 +22,16 @@ import { MediaType } from "../app/types/MediaType";
 interface GameFormProps {
   isSuddenDeath: boolean;
 }
+
+const getEmojiRowClass = (count: number) => {
+  if (count <= 3) {
+    return "tm-emoji-row-few";
+  }
+  if (count <= 5) {
+    return "tm-emoji-row-mid";
+  }
+  return "tm-emoji-row-many";
+};
 
 export default function GameForm({ isSuddenDeath }: GameFormProps) {
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -49,6 +59,8 @@ export default function GameForm({ isSuddenDeath }: GameFormProps) {
   );
 
   const [shuffledQuestions, setShuffledQuestions] = useState<Question[]>([]);
+  const emojiTokens = useMemo(() => emoji.split("/").filter((entry) => entry !== ""), [emoji]);
+  const emojiRowClass = useMemo(() => getEmojiRowClass(emojiTokens.length), [emojiTokens.length]);
   const dateLabel = useMemo(
     () =>
       new Date().toLocaleDateString("en-GB", {
@@ -192,7 +204,7 @@ export default function GameForm({ isSuddenDeath }: GameFormProps) {
     <div className="w-full">
       <SideMenu isOpen={isMenuOpen} onMenuToggle={handleMenuToggle} onCheckboxChange={handleCheckboxChange} />
 
-      <Navbar onMenuToggle={handleMenuToggle} modeLabel={isSuddenDeath ? "Sudden Death" : "Timed Game"} dateLabel={dateLabel} />
+      <Navbar onMenuToggle={handleMenuToggle} modeLabel={isSuddenDeath ? "Sudden Death" : "Timed Game"} dateLabel={dateLabel} showHowToPlay={!isSuddenDeath} />
 
       {showCongratulationsScreen ? (
         <CongratulationsScreen
@@ -208,56 +220,57 @@ export default function GameForm({ isSuddenDeath }: GameFormProps) {
       ) : showIntroScreen ? (
         <IntroScreen introTimeRemaining={introTimeRemaining} onIntroTimeTick={handleIntroTimeTick} onCountdownFinish={handleIntroCountdownFinish} isSuddenDeath={isSuddenDeath} />
       ) : (
-        <main className="mx-auto w-full max-w-5xl space-y-4">
-          <section className={`tm-card p-5 sm:p-6 ${isSuddenDeath ? "tm-sd-surface" : ""}`}>
-            {isSuddenDeath && (
-              <>
-                <div className="tm-sd-emoji tm-sd-emoji-a" aria-hidden="true">
-                  ⚡
-                </div>
-                <div className="tm-sd-emoji tm-sd-emoji-b" aria-hidden="true">
-                  😈
-                </div>
-                <div className="tm-sd-emoji tm-sd-emoji-c" aria-hidden="true">
-                  ☠️
-                </div>
-                <div className="tm-sd-emoji tm-sd-emoji-d" aria-hidden="true">
-                  🎯
-                </div>
-              </>
-            )}
-            <div className="mb-4 flex flex-wrap items-center justify-center gap-2 border-b border-[#dfdfda] pb-4">
-              <span className="tm-pill">{isSuddenDeath ? "⚡ Sudden Death" : "🕒 Timed Game"}</span>
-              <Counter count={count} isSuddenDeath={isSuddenDeath} />
-              {!isSuddenDeath && <Countdown timeRemaining={timeRemaining} onTimeTick={handleTimeTick} onCountdownFinish={handleCountdownFinish} />}
-            </div>
-
-            <EmojiDisplay emoji={emoji} mediaType={mediaType} framed={!isSuddenDeath} />
-
-            {isSuddenDeath ? (
-              <div className="mt-3 flex flex-col items-center justify-center gap-1">
-                <span className="tm-meta-label">Guesses</span>
-                <Points count={count} guesses={guesses} pendingCount={1} />
+        <main>
+          <GameSurface
+            mode={isSuddenDeath ? "suddenDeath" : "daily"}
+            topRow={
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <span className="tm-pill tm-pill-hover">{isSuddenDeath ? "⚡ Sudden Death" : "🕒 Timed Game"}</span>
+                <Counter count={count} isSuddenDeath={isSuddenDeath} />
+                {!isSuddenDeath && <Countdown timeRemaining={timeRemaining} onTimeTick={handleTimeTick} onCountdownFinish={handleCountdownFinish} />}
               </div>
-            ) : (
-              <div className="mt-3 flex items-center justify-center gap-2">
-                <span className="tm-meta-label">Guesses</span>
-                <Points count={count} guesses={guesses} />
+            }
+            categoryRow={
+              <div className="mb-3 flex items-center justify-center">
+                <span className="tm-pill tm-pill-primary tm-pill-hover tm-pill-category">{mediaType}</span>
               </div>
-            )}
-
-            <div className="mt-4">
-              <GuessInput
-                answer={title}
-                answerEmoji={emoji}
-                potentialAnswers={acceptableAnswers}
-                onGuess={handleGuess}
-                onGuessesUpdate={handleGuessUpdate}
-                guesses={guesses}
-                isSuddenDeath={isSuddenDeath}
-              />
-            </div>
-          </section>
+            }
+            emojiRow={
+              <div className={`tm-emoji-row ${emojiRowClass}`}>
+                {emojiTokens.map((token, index) => (
+                  <span key={`${token}-${index}`} className="tm-emoji-char">
+                    {token}
+                  </span>
+                ))}
+              </div>
+            }
+            guessesRow={
+              isSuddenDeath ? (
+                <div className="tm-guess-hover mt-3 flex flex-col items-center justify-center gap-1">
+                  <span className="tm-meta-label">Guesses</span>
+                  <Points count={count} guesses={guesses} pendingCount={1} />
+                </div>
+              ) : (
+                <div className="mt-3 flex items-center justify-center gap-2">
+                  <span className="tm-meta-label">Guesses</span>
+                  <Points count={count} guesses={guesses} />
+                </div>
+              )
+            }
+            inputArea={
+              <div className="mt-4">
+                <GuessInput
+                  answer={title}
+                  answerEmoji={emoji}
+                  potentialAnswers={acceptableAnswers}
+                  onGuess={handleGuess}
+                  onGuessesUpdate={handleGuessUpdate}
+                  guesses={guesses}
+                  isSuddenDeath={isSuddenDeath}
+                />
+              </div>
+            }
+          />
         </main>
       )}
     </div>

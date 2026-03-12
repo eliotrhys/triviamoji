@@ -111,7 +111,11 @@ export default function Keyboard({ handleCurrentWordChange, onEnter, showPreview
 
   return (
     <>
-      {showPreview && <div className={`tm-input-preview mb-3 text-center ${plainPreview ? "tm-input-preview-plain" : ""}`}>{currentWord === "" ? <span className="text-slate-400">Start typing your guess...</span> : currentWord}</div>}
+      {showPreview && (
+        <div className={`tm-input-preview mb-3 text-center ${plainPreview ? "tm-input-preview-plain" : ""}`}>
+          {currentWord === "" ? <span className="tm-keyboard-placeholder">Start typing your guess...</span> : currentWord}
+        </div>
+      )}
       <div className="space-y-1">
         {keyboardLayout.map((row, rowIndex) => (
           <div className="flex items-center justify-center gap-1" key={rowIndex}>

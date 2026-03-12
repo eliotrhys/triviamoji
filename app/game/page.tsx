@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import AppShell from "../../components/AppShell";
 import GameForm from "../../components/GameForm";
+import DarkModeToggle from "../../components/DarkModeToggle";
 
 export const metadata: Metadata = {
   title: "Play Emoji Trivia",
@@ -19,14 +20,11 @@ export default function Page() {
   return (
     <AppShell adSlotId={topBannerSlotId}>
       <GameForm isSuddenDeath={isSuddenDeath} />
-      <section className="tm-help-card mx-auto mt-4 w-full max-w-5xl rounded-2xl p-5">
-        <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">💡 Need Help?</div>
-        <h3 className="mt-2 text-2xl font-semibold text-slate-800">Learn the rules in 20 seconds</h3>
-        <Link href="/" className="tm-link-chip mt-4 inline-flex">
-          How to play →
-        </Link>
-      </section>
-      <footer className="mx-auto mt-6 flex max-w-3xl flex-wrap justify-center gap-x-5 gap-y-2 pb-4 text-sm text-slate-700">
+      <footer className="tm-footer mx-auto mt-6 flex max-w-3xl flex-wrap justify-center gap-x-5 gap-y-2 pb-4 text-sm text-slate-700">
+        <DarkModeToggle />
+        <a href="https://x.com/eliothectorson" target="_blank" rel="noreferrer" className="tm-link-chip tm-pill-hover">
+          𝕏 Follow @eliothectorson
+        </a>
         <Link href="/about" className="tm-link">
           About
         </Link>

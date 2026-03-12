@@ -94,21 +94,25 @@ export default function CongratulationsScreen({
       <motion.section
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`tm-card p-6 text-center sm:p-7 ${isSuddenDeath ? "tm-sd-surface" : ""}`}
+        className="tm-card p-6 text-center sm:p-7"
       >
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Game Over</p>
         <h1 className="tm-title mt-2 text-3xl sm:text-4xl">{isSuddenDeath ? "GAME OVER" : "Time Up"}</h1>
 
         <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
-          <span className="tm-pill tm-pill-primary">Final Score {finalScore}</span>
-          <span className="tm-pill">Best Score {highestScore}</span>
+          <span className="tm-pill tm-pill-primary">
+            Final Score <span className="tm-pill-number">{finalScore}</span>
+          </span>
+          <span className="tm-pill">
+            Best Score <span className="tm-pill-number">{highestScore}</span>
+          </span>
         </div>
 
         {lastIncorrectAnswer && (
-          <div className="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-4 text-rose-700">
+          <div className="tm-last-answer-card mt-4 rounded-2xl border px-4 py-4">
             <div className="text-3xl">{lastIncorrectEmoji ? lastIncorrectEmoji.replaceAll("/", "") : ""}</div>
-            <div className="mt-2 text-xs font-semibold uppercase tracking-[0.16em] text-rose-500">Last answer was</div>
-            <div className="mt-1 text-3xl font-extrabold text-rose-700 sm:text-4xl">{lastIncorrectAnswer.toUpperCase()}</div>
+            <div className="tm-last-answer-label mt-2 text-xs font-semibold uppercase tracking-[0.16em]">Last answer was</div>
+            <div className="tm-last-answer-text mt-1 text-3xl font-extrabold sm:text-4xl">{lastIncorrectAnswer.toUpperCase()}</div>
           </div>
         )}
 
@@ -131,10 +135,10 @@ export default function CongratulationsScreen({
 
         <div className="mt-5 flex flex-wrap justify-center gap-2">
           <button type="button" className="tm-btn-share" onClick={shareResult}>
-            Share Score
+            ↗ Share Score
           </button>
           <button type="button" className="tm-btn-copy" onClick={() => copyText(`Final Score ${finalScore}`, "Score copied")}>
-            Copy Score
+            ⧉ Copy Score
           </button>
           <button className="tm-btn-primary" onClick={onRestart}>
             Play Again

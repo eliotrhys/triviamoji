@@ -21,5 +21,10 @@ export default function Countdown({ timeRemaining, onCountdownFinish, onTimeTick
     }
   }, [onCountdownFinish, timeRemaining]);
 
-  return <div className={`tm-pill ${timeRemaining < 11 ? "tm-pill-danger" : ""}`}>⏰ {timeRemaining}s</div>;
+  return (
+    <div className={`tm-pill ${timeRemaining < 11 ? "tm-pill-danger" : ""}`}>
+      ⏰
+      <span className="tm-pill-number">{timeRemaining}</span>s
+    </div>
+  );
 }
