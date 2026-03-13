@@ -230,6 +230,20 @@ export default function Page() {
                 </span>
               )}
             </div>
+            <div className="mt-7">
+              <p className="tm-category-count shrink-0 text-center text-base font-semibold sm:text-lg lg:text-left">
+                Questions in <span className="tm-category-count-number font-extrabold">{categoryList.length}</span> unique categories!
+              </p>
+              <div className="tm-category-marquee mt-3">
+                <div className="tm-category-track">
+                  {marqueeCategories.map((category, index) => (
+                    <span key={`${category}-${index}`} className="tm-pill tm-pill-hover tm-marquee-pill">
+                      {category}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="tm-daily-card rounded-2xl p-5 lg:col-span-3">
@@ -266,21 +280,6 @@ export default function Page() {
                 Hide Daily Game
               </button>
             )}
-          </div>
-        </section>
-
-        <section className="mx-auto mt-4 flex w-full max-w-5xl flex-col gap-3 lg:flex-row lg:items-center">
-          <p className="tm-category-count shrink-0 text-center text-base font-semibold sm:text-lg lg:text-left">
-            Questions in <span className="tm-category-count-number font-extrabold">{categoryList.length}</span> unique categories!
-          </p>
-          <div className="tm-category-marquee lg:flex-1">
-            <div className="tm-category-track">
-              {marqueeCategories.map((category, index) => (
-                <span key={`${category}-${index}`} className="tm-pill tm-pill-hover tm-marquee-pill">
-                  {category}
-                </span>
-              ))}
-            </div>
           </div>
         </section>
 

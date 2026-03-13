@@ -36,7 +36,20 @@ export default function TopAdBanner({ slotId }: TopAdBannerProps) {
           data-full-width-responsive="true"
         />
       ) : (
-        <div className="tm-ad-placeholder">Wide Ad Slot</div>
+        <div className="tm-ad-placeholder">
+          <a
+            href="https://www.lifereel.co.uk/"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Visit LifeReel"
+            className="block h-full w-full"
+          >
+            <picture>
+              <source media="(min-width: 768px)" srcSet="/images/lifereel_advert_desktop.jpg" />
+              <img src="/images/lifereel_advert.jpg" alt="LifeReel advertisement" className="tm-ad-image" />
+            </picture>
+          </a>
+        </div>
       )}
     </section>
   );
