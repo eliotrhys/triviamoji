@@ -101,8 +101,8 @@ export const FamousPeopleQuestions: Question[] = [
     },
 
   {
-        title: "Beyoncé",
-        acceptableAnswers: ["beyoncé", "beyonce", "bey", "sasha fierce", "beyonce knowles", "beyoncé knowles"],
+        title: "",
+        acceptableAnswers: ["beyon"],
         emoji: "🐝/🔛/🌊",
         mediaType: MediaType.FamousPeople
     }
